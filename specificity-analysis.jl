@@ -11,43 +11,57 @@ treatments (similar to analyses that use Dice coefficient as a similarity metric
 and use a randomization test to compare the similarity of metagenomic evolution
 to external genomic datasets from evolution experiments with Tetracycline selection.
 
+This analysis builds upon the analysis framework in:
+Deatherage et al. (2017) "Specificity of genome evolution in experimental populations of
+Escherichia coli evolved at different temperatures"
+
+TODO: correct p-values for multiple testing as needed in the future.
+
 """
 
-using DataFrames, DataFramesMeta, CSV, HypothesisTests, StatsBase, Random, FLoops
+using DataFrames, DataFramesMeta, CSV, StatsBase, HypothesisTests, MultipleTesting, Random, FLoops
 
 
-function GeneSpecificityFisherTest(gene_specificity_summary, gene)
+function GeneSpecificityFisherTest(specificity_summary, gene, treatment1, treatment2)
     """
     The idea here is the following contingency table:
 
-                                                   pUC  | noPlasmid
-    Number of metagenomes w/  mutations in gene x | A   |     B
-    Number of metagenomes w/o mutations in gene x | C   |     D
+                                                                                             pUC  | noPlasmid
+    Number of metagenomes w/  mutations in gene x   |  A  |  B
+    Number of metagenomes w/o mutations in gene x  |  C |  D
 
+Possible values for the treatment_strs: (TODO: sequence B30_p15A)
+B20_None
+B20_p15A
+B20_pUC
+B30_None
+B30_pUC
     """
     
     POPS_PER_TREATMENT = 5
         
-    cur_summary = @subset(gene_specificity_summary, :Gene .== gene)
+    cur_summary = @subset(specificity_summary, :Gene .== gene)
     A = 0
     try ## when A == 0, there is no corresponding row in the df.
-        A = @subset(cur_summary, :Treatment .== "B30_pUC").NumPops[1]
+        A = @subset(cur_summary, :Treatment .== treatment1).NumPops[1]
     catch BoundsError end
 
     C = 0
     try ## when C == 0, there is no corresponding row in the df.
-        C = @subset(cur_summary, :Treatment .== "B30_None").NumPops[1]
+        C = @subset(cur_summary, :Treatment .== treatment2).NumPops[1]
     catch BoundsError end
     
     B = POPS_PER_TREATMENT - A
     D = POPS_PER_TREATMENT - C
-    gene_test = FisherExactTest(A,B,C,D)
-    pval = pvalue(gene_test)
-    if pval < 0.05
-        println(gene)
-        println(gene_test)
-        println()
-    end
+    try
+        gene_test = FisherExactTest(A,B,C,D)
+        pval = pvalue(gene_test)
+        if pval < 0.05
+            println(gene)
+            println(gene_test)
+            println()
+        end
+    catch ArgumentError end ## If the FisherExactTest fails, return silently.
 end
 
 
@@ -63,9 +77,25 @@ function RunGeneSpecificityAnalysis(evolved_mutations)
         @orderby(-:MutationCount, :Gene, :Treatment)
     end
 
-    for gene in unique(gene_specificity_summary.Gene)
-        GeneSpecificityFisherTest(gene_specificity_summary, gene)
+    ## let's examine the following pairs of treatments.
+    treatments_to_compare = [("B30_None", "B30_pUC"), ("B20_None", "B20_pUC"),
+                             ("B20_None", "B20_p15A"), ("B20_pUC", "B20_p15A"),
+                             ("B20_None", "B30_None"), ("B20_pUC", "B30_pUC")]
+        
+    ## iterate over the pairs of treatments to compare.
+    for treatment_tuple in treatments_to_compare
+        treatment1, treatment2 = treatment_tuple
+        ## critical step: subset the dataframe by the treatments of interest.
+        ## we only want to compare genes found in at least one of these treatments.
+        sliced_specificity_summary = @rsubset(gene_specificity_summary, :Treatment in treatment_tuple)
+
+        println("Gene Specificity Comparison between " * treatment1 * " and " * treatment2)
+        println("***********************************")
+        for gene in unique(sliced_specificity_summary.Gene)
+            GeneSpecificityFisherTest(gene_specificity_summary, gene, treatment1, treatment2)
+        end
     end
+
 end
 
 
@@ -140,7 +170,7 @@ function WeightedJaccardRandomizationTest(M1, M2, N = 100_000, ncores = 4)
     M1_mean = MeanWeightedJaccardSimilarityForTreatment(M1)
     M2_mean = MeanWeightedJaccardSimilarityForTreatment(M2)
 
-    ## following notation in Deatherage et al. (2014).
+    ## following notation in Deatherage et al. (2017).
     Sw = mean([M1_mean,M2_mean]) ## within treatment similarity
     Sb = MeanWeightedJaccardSimilarityBetweenTreatments(M1,M2)
 
@@ -202,46 +232,64 @@ end
 
 
 ################################################################################
-## import the data.
-## NOTE: This currently has all mutations >5%, should probably filter by
-## Frequency > 10%.
-## But filtering by >10% is way too conservative for the no Plasmid data,
-## which has great coverage-- 200X-300X. 5% in those data is like
-## 20% in the pUC plasmid treatment.
-
-## for instance, I find parallel evolution at nucleotide level at ilvC/ppiC,
-## which is 7-9% in 3 of the no plasmid populations.
+## import the data. All mutation filtering criteria is done when breseq is used to call variants,
+## so no additional filters are applied at this stage of the data analysis.
 
 evolved_mutations = CSV.read(
     "../results/draft-manuscript-1A/genome-analysis/evolved_mutations.csv", DataFrame)
 ## Add a Treatment Column.
 @rtransform!(evolved_mutations, :Treatment = :Transposon * "_" * :Plasmid)
-## for now, I keep mutations > 5% in the no plasmid data, and keep
-## mutations >10% in the pUC plasmid data.
-@rsubset!(evolved_mutations, :Plasmid == "None" || :Frequency > 0.1)
 
-pUC_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_pUC")
-noPlasmid_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_None")
+B20_noPlasmid_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_None")
+B20_pUC_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_pUC")
+B20_p15A_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_p15A")
+
+B30_pUC_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_pUC")
+B30_noPlasmid_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_None")
 ###############################################################################
 ## Gene-specific specificity analyses. Use Fisher's exact test, and extensions
 ## to metagenomic data.
 
 ## Fisher's exact test is really too conservative but it gets the job done.
-## TODO: find a better way that doesn't needlessly throw out data.
+## TODO: find a better way that doesn't needlessly throw out data;
+## this is a population-level presence/absence analysis,.
 
-## TODO: generalize this function to other pairs of treatments, when the data arrives.
-## (treatments are currently hardcoded).
-
+# the treatments are currently hardcoded in this function.
 RunGeneSpecificityAnalysis(evolved_mutations)
 
-## Based on this population-level presence/absence analysis,
-## following genes show evidence of specificity:
+## the following genes show evidence of specificity between B30_None and B30_pUC.
 ## lysO/aqpZ
 ## yohP/dusC
 ## tetA
-## KanR (tet-transposon insertions on the plasmid)
+## tetA-Tn5-KanR (tet-transposon insertions on the plasmid)
 ## frmR/yaiO
 ## yeaD/yeaE
+## YY-K12originalarray/KanR
+
+## the following genes show evidence of specificity between B20_None and B20_pUC.
+## gatY/fbaB
+## lysO/aqpZ
+## yiiG/frvR
+## yohP/dusC
+## YY-K12originalarray/KanR
+## YY-K12originalarray
+
+## the following genes show evidence of specificity between B20_p15A and B20_pUC.
+## gatY/fbaB
+## YY-K12originalarray/KanR
+## lysO/aqpZ
+## YY-K12originalarray
+## yiiG/frvR
+## yohP/dusC
+## ves/spy
+
+## CRITICAL TODO!!!! subtract mutations from B20 ancestors, and re-run to see what's real.
+## the following genes show evidence of specificity between B20_None and B30_None.
+## fill in this section later.
+
+## the following genes show evidence of specificity between B20_pUC and B30_pUC.
+## fill in this section later.
+
 
 ################################################################################
 ## I use the weighted Jaccard index to calculate the specificity of evolutionary
@@ -253,24 +301,59 @@ RunGeneSpecificityAnalysis(evolved_mutations)
 ## First, make matrices for the metagenomes in each treatment. Each row is a different
 ## gene or intergenic region that is mutated in at least one mixed pop. sample.
 
-noPlasmid_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B30_None")
-pUC_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B30_pUC")
+B30_noPlasmid_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B30_None")
+B30_pUC_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B30_pUC")
 
 ## more parallelism in the no Plasmid treatment than in the pUC treatment
-## (given differences in chromosomal coverage)
-noPlasmid_Mean = MeanWeightedJaccardSimilarityForTreatment(noPlasmid_matrix)
-pUC_Mean = MeanWeightedJaccardSimilarityForTreatment(pUC_matrix)
+B30_noPlasmid_Mean = MeanWeightedJaccardSimilarityForTreatment(B30_noPlasmid_matrix)
+B30_pUC_Mean = MeanWeightedJaccardSimilarityForTreatment(B30_pUC_matrix)
 
-## I follow the logic of the calculation in Deatherage et al. (2014) in PNAS.
-glued_matrix = hcat(noPlasmid_matrix,pUC_matrix)
+## I follow the logic of the calculation in Deatherage et al. (2017) in PNAS.
+B30_glued_matrix = hcat(B30_noPlasmid_matrix, B30_pUC_matrix)
 
-Grand_Mean = MeanWeightedJaccardSimilarityForTreatment(glued_matrix)
-withinTreatment_Mean = mean([noPlasmid_Mean,pUC_Mean])
-betweenTreatment_Mean = MeanWeightedJaccardSimilarityBetweenTreatments(pUC_matrix, noPlasmid_matrix)
+B30_Grand_Mean = MeanWeightedJaccardSimilarityForTreatment(B30_glued_matrix)
+B30_withinTreatment_Mean = mean([B30_noPlasmid_Mean, B30_pUC_Mean])
+B30_betweenTreatment_Mean = MeanWeightedJaccardSimilarityBetweenTreatments(B30_pUC_matrix, B30_noPlasmid_matrix)
                                                                        
 ## now, do the randomization test for statistical significance.
-@time WeightedJaccardRandomizationTest(pUC_matrix, noPlasmid_matrix, 100_000)
-## p = 0.00026 with 100,000 bootstraps.
+@time WeightedJaccardRandomizationTest(B30_pUC_matrix, B30_noPlasmid_matrix, 100_000)
+## p = 0.00001 with 100,000 bootstraps.
+
+## re-run the comparison with B20.
+
+B20_noPlasmid_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B20_None")
+B20_pUC_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B20_pUC")
+B20_p15A_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B20_p15A")
+
+##  parallelism in the no Plasmid treatment than in the pUC treatment
+B20_noPlasmid_Mean = MeanWeightedJaccardSimilarityForTreatment(B20_noPlasmid_matrix)
+B20_pUC_Mean = MeanWeightedJaccardSimilarityForTreatment(B20_pUC_matrix)
+B20_p15A_Mean = MeanWeightedJaccardSimilarityForTreatment(B20_p15A_matrix)
+
+## I follow the logic of the calculation in Deatherage et al. (2017) in PNAS.
+B20_glued_matrix = hcat(B20_noPlasmid_matrix, B20_pUC_matrix, B20_p15A_matrix)
+
+B20_Grand_Mean = MeanWeightedJaccardSimilarityForTreatment(B20_glued_matrix)
+## CRITICAL TODO: FIGURE OUT WHETHER THIS IS CORRECT...
+B20_withinTreatment_Mean = mean([B20_noPlasmid_Mean, B20_pUC_Mean, B20_p15A_Mean])
+
+## CRITICAL TODO: figure how what to do with the p15A treatment now.
+
+B20_betweenTreatment_Mean1 = MeanWeightedJaccardSimilarityBetweenTreatments(B20_pUC_matrix, B20_noPlasmid_matrix)
+
+B20_betweenTreatment_Mean2 = MeanWeightedJaccardSimilarityBetweenTreatments(B20_pUC_matrix, B20_p15A_matrix)
+
+B20_betweenTreatment_Mean3 = MeanWeightedJaccardSimilarityBetweenTreatments(B20_noPlasmid_matrix, B20_p15A_matrix)
+
+## now, do the randomization test for statistical significance.
+@time WeightedJaccardRandomizationTest(B20_pUC_matrix, B20_noPlasmid_matrix, 100_000)
+## p = 0.00327 with 100,000 bootstraps.
+
+@time WeightedJaccardRandomizationTest(B20_pUC_matrix, B20_p15A_matrix, 100_000)
+## p = 0.00284 with 100,000 bootstraps.
+
+@time WeightedJaccardRandomizationTest(B20_noPlasmid_matrix, B20_p15A_matrix, 100_000)
+## p = 0.00254 with 100,000 bootstraps.
 
 ################################################################################
 ## comparison of evolutionary paths to other published evolution experiments.
@@ -298,6 +381,8 @@ bottery_mutations = CSV.read("../data/draft-manuscript-1A/Bottery2017-Figure_2_S
 
 relevant_bottery_muts = @rsubset(bottery_mutations, :Gene in evolved_mutations.Gene)
 
+pUC_treatment_mutations = @rsubset(evolved_mutations, :Plasmid == "pUC")
+noPlasmid_treatment_mutations = @rsubset(evolved_mutations, :Plasmid == "None")
 
 pUC_and_bottery_muts = @rsubset(bottery_mutations, :Gene in pUC_treatment_mutations.Gene)
 noPlasmid_and_bottery_muts = @rsubset(bottery_mutations, :Gene in noPlasmid_treatment_mutations.Gene)
@@ -326,7 +411,7 @@ my_frmR_yaiO_muts = @rsubset(evolved_mutations, :Gene == "frmR/yaiO")
 ## for Accelerating Bacterial and Trans-Kingdom Conjugations by IncP1 T4SS Machinery
 ## the frm operon is induced in response to formaldehyde
 
-## idea for how to do this analysis, from Deatherage et al. (2014):
+## idea for how to do this analysis, from Deatherage et al. (2017):
 ## We measured the similarity of genomic evolution in the TEE to the LTEE by calculating
 ## a recapitulation index (RI) equal to the percentage of qualifying mutations in a
 ## particular thermal group that affected genes that subsequently acquired a qualifying
@@ -341,10 +426,11 @@ my_frmR_yaiO_muts = @rsubset(evolved_mutations, :Gene == "frmR/yaiO")
 
 ## Let's compare to mutations in Kyle Card's 2021 PNAS paper.
 ## nothing really to write home about-- one deletion removing frmR and yaiO
-## in Tet treatment, and some mutations affecting envZ, which only occurs
-## at 5% frequency in RM6.200.1.
+## in Tet treatment, and some mutations affecting envZ and marR.
 card2021_mutations = CSV.read("../data/draft-manuscript-1A/Card2021_Mutations_curated.csv", DataFrame)
 relevant_card2021_mutations = filter_Card2021_mutations(card2021_mutations, evolved_mutations)
+## show all columns.
+show(relevant_card2021_mutations, allcols=true)
 
 ####################################
 ## Lukacisinova 2020 in Nature Communications.
@@ -363,6 +449,6 @@ gene_in_lukacisinova_gene_column = [occursin(lukacisinova_regex, x) ? true : fal
 
 evolved_mutations.matches_lukacisinova = gene_in_lukacisinova_gene_column
 
-## minimal overlap: three mutations in two matching loci: envZ and acrR.
+## minimal overlap: 8 mutations in 5 matching loci: envZ, acrR, acrA/acrR, marR, bamA
 evolved_mutations_in_lukacisinova_genes = @rsubset(evolved_mutations, :matches_lukacisinova)
 

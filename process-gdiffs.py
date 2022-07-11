@@ -6,6 +6,8 @@ process-gdiffs.py by Rohan Maddamsetti.
 I take the evolved genomes, and write out evolved-mutations.csv for
 downstream analysis in R.
 
+Usage: python process-gdiffs.py
+
 """
 
 from os.path import join, dirname, realpath

@@ -13,7 +13,10 @@
 ## and then measuring copy number by qPCR,
 ## and measuring growth curves again to see if there is any change.
 
-## IMPORTANT TODO: subtract blanks from data before calculations.
+
+## CRITICAL TODO: for growth rate vs. lag measurements,
+## fit a linear model to estimate lag_time as follows:
+## time to hit OD threshold = lag_time + growth_rate * time
 
 library(tidyverse)
 library(cowplot)
@@ -28,12 +31,8 @@ treatment.plot <- ggplot(experiment.design.df,
     ylab("Tetracycline (ug/mL)") +
     xlab("Day")
 
-################################################################################
-## plot OD600 over time in the nine day evolution experiment.
 
-## for OD600 measurement analysis of 9 day evolution experiments.
 subtract.OD600.blanks <- function(OD600.df) {
-
     blanks.df <- filter(OD600.df, Treatment == "Blank")
     media.blank <- mean(blanks.df$RawOD600)
     subtracted.df <- OD600.df %>%
@@ -42,9 +41,10 @@ subtract.OD600.blanks <- function(OD600.df) {
     return(subtracted.df)
 }
 
-## make a plot of OD600 over time in the nine day experiment.
+################################################################################
+## plot OD600 over time in the nine day evolution experiment.
 december.11.OD600.df <- read.csv("../data/draft-manuscript-1A/OD600-data/2021-12-11-Full-9-day-OD600.csv") %>%
-    ## subtract LB blanks to get the true OD measurement.
+    ## subtract LB blanks to get the true OD measurement
     subtract.OD600.blanks() %>%
     mutate(BiologicalReplicate = as.factor(BiologicalReplicate)) %>%
     filter(!(Treatment %in% c("Blank", "Empty")))
@@ -98,21 +98,24 @@ well.to.treatment.for.big.clone.OD600.experiment <- function(Well) {
     return(my.treatment)
 }
 
+
 tidy.tecan.clone.plate.data <- function(long.format.data, Tet.conc) {
     long.format.data %>%
         pivot_longer(cols=V1, values_to="Well") %>%
         select(-name) %>% ## drop this useless column
         pivot_longer(!Well,
                      names_to = "Time",
-                     values_to = "OD600",
+                     values_to = "RawOD600",
                      names_pattern = "V(.+)") %>%
         mutate(Time = as.numeric(Time) - 1) %>%
         mutate(minutes = 10*Time) %>%
         mutate(hours = minutes/60) %>%
         mutate(Tet = Tet.conc) %>%
-        mutate(treatment = sapply(Well, well.to.treatment.for.big.clone.OD600.experiment)) %>%
-        mutate(treatment = as.factor(treatment)) %>%
-        filter(!(treatment %in% c("Blank", "Empty")))
+        mutate(Treatment = sapply(Well, well.to.treatment.for.big.clone.OD600.experiment)) %>%
+        mutate(Treatment = as.factor(Treatment)) %>%
+        ## subtract LB blanks to get the true OD measurement.
+        subtract.OD600.blanks() %>%
+        filter(!(Treatment %in% c("Blank", "Empty")))
 }
 
 plot.OD600.over.time <- function(tidy.data) {
@@ -120,7 +123,7 @@ plot.OD600.over.time <- function(tidy.data) {
         ggplot(
             aes(x = hours,
                 y = OD600,
-                color = treatment)) +
+                color = Treatment)) +
         geom_point(size=0.5) +
         geom_vline(xintercept=24,linetype="dashed",color="red")
 }
@@ -129,7 +132,7 @@ plot.OD600.over.time <- function(tidy.data) {
 plot.delta.log2.OD600.over.time <- function(tidy.data) {
     ## let's plot the derivatives of log(OD600) over time.
     delta.log2.OD600.data <- tidy.data %>%
-        group_by(Well, treatment) %>%
+        group_by(Well, Treatment) %>%
         mutate(log2.OD600 = log2(OD600)) %>%
         mutate(delta.log2.OD600 = log2.OD600 - lag(log2.OD600))
     
@@ -144,30 +147,30 @@ plot.delta.log2.OD600.over.time <- function(tidy.data) {
             aes(x = hours,
                 y = delta.log2.OD600,
                 color = Well)) + geom_line() + theme_classic() +
-        facet_grid(treatment~.) +
+        facet_grid(Treatment~.) +
         ylab("Delta log2(OD600)") +
         xlab("Time (hours)") +
-        guides(color=FALSE)
+        guides(color = "none")
 }
 
 make.max.growth.rate.df <- function(tidy.data) {
     tidy.max.growth.rate.data <- tidy.data %>%
         filter(OD600 >= 0.3) %>%
         filter(OD600 <= 0.4) %>%
-        group_by(Well, treatment) %>%
+        group_by(Well, Treatment) %>%
         nest() %>% ## nest the data by well, then calculate the log2(OD600) slope using lm().
         mutate(fit = map(data, ~lm(log2(OD600) ~ hours, data = .))) %>%
         ## get the fit parameters.
         ## see tutorial at:
         ## https://www.kaylinpavlik.com/linear-regression-with-nested-data/
         mutate(tidied = map(fit, tidy)) %>%
-        select(Well, treatment, tidied) %>%
+        select(Well, Treatment, tidied) %>%
         unnest(tidied) %>%
         filter(term == 'hours') ## we only care about the slope parameter.
 }
 
 
-summarize.time.lag <- function(well.df, OD.threshold = 0.1) {
+summarize.time.lag <- function(well.df, OD.threshold = 0.125) {
     ## to compare time lags, measure point when OD600 hits the threshold
     lag.min.index <- max(min(which(well.df$OD600 > OD.threshold)), 1)
     t.OD.hit.lag.min <- well.df[lag.min.index,]$hours
@@ -177,7 +180,7 @@ summarize.time.lag <- function(well.df, OD.threshold = 0.1) {
 }
 
 
-make.time.lag.df <- function(tidy.data, lag.threshold = 0.1) {
+make.time.lag.df <- function(tidy.data, lag.threshold = 0.125) {
 
     ## make a one-variable function given the lag.threshold.
     .summarize.time.lag <- partial(.f = summarize.time.lag, OD.threshold = lag.threshold)
@@ -187,7 +190,7 @@ make.time.lag.df <- function(tidy.data, lag.threshold = 0.1) {
         filter(hours > 0.5) %>%
         split(.$Well) %>%
         map_dfr(.f=.summarize.time.lag) %>%
-        select(Well, Tet, treatment, time.lag) %>%
+        select(Well, Tet, Treatment, time.lag) %>%
         distinct() %>%
         mutate(inverse.lag = 1/time.lag)
 }
@@ -196,9 +199,9 @@ make.time.lag.df <- function(tidy.data, lag.threshold = 0.1) {
 plot.growth.lag <- function(lag.df) {
     lag.df %>%
         ggplot(
-            aes(x = treatment,
+            aes(x = Treatment,
                 y = time.lag,
-                color = treatment)) + geom_point() + theme_classic() +
+                color = Treatment)) + geom_point() + theme_classic() +
         ylab("Time to reach OD600 threshold")
 }
 
@@ -206,9 +209,9 @@ plot.growth.lag <- function(lag.df) {
 plot.max.growth.rate <- function(tidy.max.growth.rate.data) {   
     tidy.max.growth.rate.data %>%
         ggplot(
-            aes(x = treatment,
+            aes(x = Treatment,
                 y = estimate,
-                color = treatment)) + geom_point() + theme_classic() +
+                color = Treatment)) + geom_point() + theme_classic() +
         ylab("growth rate between OD600 0.3-0.4")
 }
 
@@ -216,9 +219,9 @@ plot.max.growth.rate <- function(tidy.max.growth.rate.data) {
 plot.max.growth.rate.histogram <- function(tidy.max.growth.rate.data) {
     tidy.max.growth.rate.data %>%
         ggplot(
-            aes(fill = treatment,
+            aes(fill = Treatment,
                 x = estimate)) + geom_histogram(alpha=0.5) + theme_classic() +
-        facet_grid(treatment~.) +
+        facet_grid(Treatment~.) +
         xlab("growth rate between OD600 0.3-0.4") +
         labs(fill = "Presence/absence of plasmid") +
         theme(legend.position="top")
@@ -228,9 +231,9 @@ plot.24h.OD600.histogram <- function(tidy.data) {
     tidy.data %>%
         filter(hours == 24) %>%
         ggplot(
-            aes(fill = treatment,
+            aes(fill = Treatment,
                 x = OD600)) + geom_histogram(alpha=0.5) + theme_classic() +
-        facet_grid(treatment~.) +
+        facet_grid(Treatment~.) +
         ylab("OD600 at 24h timepoint") +
         labs(fill = "Presence/absence of plasmid") +
         theme(legend.position="top")
@@ -240,7 +243,7 @@ plot.24h.OD600.histogram <- function(tidy.data) {
 plot.growth.rate.vs.lag <- function(lag.df, max.growth.rate.df) {
     lag.vs.growth.rate.df <- full_join(lag.df, max.growth.rate.df)
     lag.vs.growth.rate.df %>%
-        ggplot(aes(fill = treatment, y = time.lag, x = estimate, color = treatment)) +
+        ggplot(aes(fill = Treatment, y = time.lag, x = estimate, color = Treatment)) +
         geom_point() + theme_classic() +
         ylab("Time to OD Threshold (h)") + xlab("growth rate between OD600 0.3-0.4")
 }
@@ -266,6 +269,11 @@ Jan.30.Tet50.evolved.clone.long.format.data <- read.csv(
     header=FALSE)
 Jan.30.Tet50.tidy.data <- Jan.30.Tet50.evolved.clone.long.format.data %>%
     tidy.tecan.clone.plate.data(50)
+
+## write out data for Emrah.
+write.csv(x=Jan.30.LB.tidy.data, file="../results/draft-manuscript-1A/growth-results/2022-01-30-LB-Tet0-B30-clones-tidy.csv", row.names=FALSE, quote = FALSE)
+write.csv(x=Jan.30.Tet20.tidy.data, file="../results/draft-manuscript-1A/growth-results/2022-01-30-LB-Tet20-B30-clones-tidy.csv", row.names=FALSE, quote = FALSE)
+write.csv(x=Jan.30.Tet50.tidy.data, file="../results/draft-manuscript-1A/growth-results/2022-01-30-LB-Tet50-B30-clones-tidy.csv", row.names=FALSE, quote = FALSE)
 
 ############################
 ## Plot growth over time.
@@ -388,6 +396,11 @@ Feb.01.Tet50.evolved.clone.long.format.data <- read.csv(
 Feb.01.Tet50.tidy.data <- Feb.01.Tet50.evolved.clone.long.format.data %>%
     tidy.tecan.clone.plate.data(50)
 
+## write out data for Emrah.
+write.csv(x=Feb.01.LB.tidy.data, file="../results/draft-manuscript-1A/growth-results/2022-02-01-LB-Tet0-B30-clones-tidy.csv", row.names=FALSE, quote = FALSE)
+write.csv(x=Feb.01.Tet20.tidy.data, file="../results/draft-manuscript-1A/growth-results/2022-02-01-LB-Tet20-B30-clones-tidy.csv", row.names=FALSE, quote = FALSE)
+write.csv(x=Feb.01.Tet50.tidy.data, file="../results/draft-manuscript-1A/growth-results/2022-02-01-LB-Tet50-B30-clones-tidy.csv", row.names=FALSE, quote = FALSE)
+
 ############################
 ## Plot growth over time.
 
@@ -506,6 +519,11 @@ Feb.03.Tet50.evolved.clone.long.format.data <- read.csv(
     header=FALSE)
 Feb.03.Tet50.tidy.data <- Feb.03.Tet50.evolved.clone.long.format.data %>%
     tidy.tecan.clone.plate.data(50)
+
+write.csv(x=Feb.03.LB.tidy.data, file="../results/draft-manuscript-1A/growth-results/2022-02-03-LB-Tet0-B30-clones-tidy.csv", row.names=FALSE, quote = FALSE)
+write.csv(x=Feb.03.Tet20.tidy.data, file="../results/draft-manuscript-1A/growth-results/2022-02-03-LB-Tet20-B30-clones-tidy.csv", row.names=FALSE, quote = FALSE)
+write.csv(x=Feb.03.Tet50.tidy.data, file="../results/draft-manuscript-1A/growth-results/2022-02-03-LB-Tet50-B30-clones-tidy.csv", row.names=FALSE, quote = FALSE)
+
 
 ############################
 ## Plot growth over time.

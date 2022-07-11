@@ -29,35 +29,68 @@ pop.clone.labels <- read.csv(
   stringsAsFactors=FALSE)
 
 
+##############
+## TEMPORARY HACK: remove "fixed" mutations with Frequency == 1.0
+## that are found in the ancestral DH5a+B20 strain.
+ancestral.mut.positions <- c(897327,1105685,1105791,1105812,1105910,1106014,1106021,
+                             1106558,1441958,1589337,2140692,2257581,3189165,3804752,4510097,
+                             4549970,4550084,
+                             ## this next position could be real??? CmR/TcR repeat expansion mutation in all B20 pops.
+                             ## let's just remove the CmR/TcR fixed mutations for now.
+                             1438,3020,3024,3043,3047)
+
+## best guess is that there are a number of point mutations that need to be added to the B20 transposon reference
+## sequence.
+
+##############
+
 ## there's the issue of parallelism of high frequency mutations,
 ## and parallelism of low frequency mutations. Both are important!
 ## TODO: Dissect the two cases carefully.
 
+## I require a minimum of 4 reads per strand (8 total) to support any variant call.
 evolved.mutations <- read.csv(
     file.path(projdir,
               "results/draft-manuscript-1A/genome-analysis/evolved_mutations.csv"),
     stringsAsFactors=FALSE) %>%
-    ## CRITICAL POINT: Jeff Barrick says not to trust any calls < 10% frequency,
-    ## and some calls at higher frequencies can be false positives too.
-    ## But 5% frequency is probably reliable in the no plasmid data.
-    ##filter(Frequency > 0.05) %>%
-    ##filter(Plasmid == "None" | Frequency > 0.2) %>%
-    ## I turned off these filters, since I now require a minimum of 4 reads
-    ## per strand (8 total) to support any variant call.
-    mutate(Mbp.coordinate=Position/1000000)
-## CRITICAL TODO: rotate genome coordinates based on oriC in DH5-alpha.
-##    mutate(Mbp.coordinate=oriC.coordinate/1000000)
+    ## CRITICAL TODO: rotate genome coordinates based on oriC in DH5-alpha.
+##    mutate(Mbp.coordinate=oriC.coordinate/1000000) %>%
+    mutate(Mbp.coordinate=Position/1000000) %>%
+    ## TEMPORARY HACK: remove "fixed" mutations with Frequency == 1.0
+    ## that are found in the ancestral DH5a+B20 strain.
+    filter(!(Position %in% ancestral.mut.positions))
 
 high.freq.evolved.mutations <- evolved.mutations %>%
     filter(Frequency > 0.5)
+
+B30.evolved.mutations <- evolved.mutations %>%
+    filter(Transposon == "B30")
+
+B20.evolved.mutations <- evolved.mutations %>%
+    filter(Transposon == "B20")
+
+## THIS IS CRITICAL TO LOOK AT-- for checking and filtering ancestral mutations.
+fixed.mutations <- evolved.mutations %>%
+    filter(Frequency == 1.0) %>%
+    arrange(Position,Sample)
 
 ###############################################
 
 ## Figure 2: Plot the distribution of measured allele frequencies in each population.
 
-Fig2 <- ggplot(evolved.mutations, aes(x=Frequency)) +
+Fig2A <- ggplot(B30.evolved.mutations, aes(x=Frequency)) +
     geom_histogram(bins = 100) +
-    geom_text_repel(data=filter(evolved.mutations, Frequency>0.2),
+    geom_text_repel(data=filter(B30.evolved.mutations, Frequency>0.2),
+                    aes(x=Frequency,y=1,label=Gene),
+                    fontface = "italic",size=3,show.legend=FALSE,inherit.aes=FALSE) +
+    theme_classic() +
+    ylab("Count") +
+    xlab("Allele Frequency") +
+    facet_grid(Population~Plasmid,scales="free") 
+
+Fig2B <- ggplot(B20.evolved.mutations, aes(x=Frequency)) +
+    geom_histogram(bins = 100) +
+    geom_text_repel(data=filter(B20.evolved.mutations, Frequency>0.2),
                     aes(x=Frequency,y=1,label=Gene),
                     fontface = "italic",size=3,show.legend=FALSE,inherit.aes=FALSE) +
     theme_classic() +
@@ -77,8 +110,10 @@ Fig2 <- ggplot(evolved.mutations, aes(x=Frequency)) +
 
 ## 2) do pop gen. simulations, and compare allele frequency spectrum.
 
-fig2.output <- "../results/draft-manuscript-1A/allele-frequency-spectrum.pdf"
-ggsave(Fig2, file=fig2.output,width=8,height=6)
+fig2A.output <- "../results/draft-manuscript-1A/B30-allele-frequency-spectrum.pdf"
+fig2B.output <- "../results/draft-manuscript-1A/B20-allele-frequency-spectrum.pdf"
+ggsave(Fig2A, file=fig2A.output,width=8,height=6)
+ggsave(Fig2B, file=fig2B.output,width=8,height=6)
 
 ###############################################
 ## I also make versions of Figures 3, 4, 5, in which
@@ -94,6 +129,9 @@ plot.mutations.stackbar <- function(fig.df,panel,leg=FALSE, weight.by.freq=FALSE
     } else if (panel == "pUC") {
         muts <- filter(fig.df, Plasmid == 'pUC')
         my.title <- 'Tet50, pUC plasmid'
+    }  else if (panel == "p15A") {
+        muts <- filter(fig.df, Plasmid == 'p15A')
+        my.title <- 'Tet50, p15A plasmid'
     }  else {
         stopifnot(TRUE == FALSE) ## panic if we get here.
     }
@@ -125,13 +163,13 @@ plot.mutations.stackbar <- function(fig.df,panel,leg=FALSE, weight.by.freq=FALSE
                   legend.title.align=0.5,
                   legend.text=element_text(size=12))
     } else {
-        fig <- fig + guides(fill=FALSE)
+        fig <- fig + guides(fill = "none")
     }
     
     return(fig)
 }
 
-mutation.class.df <- evolved.mutations %>%
+B30.mutation.class.df <- B30.evolved.mutations %>%
     ## give nicer names for mutation classes.
     mutate(Mutation=recode(Mutation,
                   MOB = "Mobile element transposition",
@@ -149,32 +187,71 @@ mutation.class.df <- evolved.mutations %>%
     ungroup() %>%
     data.frame() %>%
     mutate(Mutation=as.factor(as.character(Mutation)))
-    
+
+B20.mutation.class.df <- B20.evolved.mutations %>%
+    ## give nicer names for mutation classes.
+    mutate(Mutation=recode(Mutation,
+                  MOB = "Mobile element transposition",
+                  DEL = "Indel",
+                  INS = "Indel",
+                  SUB = "Multiple-base substitution",
+                  nonsynonymous = "Nonsynonymous",
+                  synonymous = "Synonymous",
+                  nonsense = "Nonsense",
+                  pseudogene = "Pseudogene",
+                  intergenic = "Intergenic",
+                  )) %>%
+    group_by(Sample, Transposon, Plasmid, Population, Mutation) %>%
+    summarize(Count=n(),WeightedCount = sum(Frequency)) %>%
+    ungroup() %>%
+    data.frame() %>%
+    mutate(Mutation=as.factor(as.character(Mutation)))
+
 ## make sure colors are the same across plots by setting levels.
-fig3A <- plot.mutations.stackbar(mutation.class.df, panel="No plasmid") + ylim(0,20)
-fig3B <- plot.mutations.stackbar(mutation.class.df, panel="pUC",leg=TRUE) + ylim(0,20)
+fig3A <- plot.mutations.stackbar(B30.mutation.class.df, panel="No plasmid") + ylim(0,25)
+fig3B <- plot.mutations.stackbar(B30.mutation.class.df, panel="pUC",leg=TRUE) + ylim(0,25)
 ## pull the legend from fig3B.
 legend <- cowplot::get_legend(fig3B)
 ## remove the legend from fig3B.
-fig3B <- fig3B + guides(fill=FALSE)
+fig3B <- fig3B + guides(fill = "none")
 
-fig3 <- plot_grid(fig3A,fig3B,legend,
-                  labels=c('A','B',''),
-                  nrow=1)
+## IMPORTANT NOTE: This may be an overestimate, since I need to subtract mutations in the ancestor.
+fig3C <- plot.mutations.stackbar(B20.mutation.class.df, panel="No plasmid") + ylim(0,25)
+fig3D <- plot.mutations.stackbar(B20.mutation.class.df, panel="p15A") + ylim(0,25)
+fig3E <- plot.mutations.stackbar(B20.mutation.class.df, panel="pUC") + ylim(0,25)
+
+## plot B30 on the top, B20 on the bottom.
+fig3 <- plot_grid(
+    fig3A,fig3B,legend,
+    fig3C, fig3D, fig3E,              
+    labels=c('A','B',"",
+             'C', 'D', 'E'),
+                  ncol = 3,
+                  nrow=2)
 
 fig3.output <- "../results/draft-manuscript-1A/mutation-classes.pdf"
-ggsave(fig3, file=fig3.output,width=8,height=4)
+ggsave(fig3, file=fig3.output,width=8,height=8)
 
 ## Repeat, but weight by allele frequency.
 
-weighted.fig3A <- plot.mutations.stackbar(mutation.class.df, panel="No plasmid",weight.by.freq=TRUE) + ylim(0,4)
-weighted.fig3B <- plot.mutations.stackbar(mutation.class.df, panel="pUC",leg=TRUE,weight.by.freq=TRUE) + ylim(0,4)
+weighted.fig3A <- plot.mutations.stackbar(B30.mutation.class.df, panel="No plasmid",weight.by.freq=TRUE) + ylim(0,9)
+weighted.fig3B <- plot.mutations.stackbar(B30.mutation.class.df, panel="pUC",leg=TRUE,weight.by.freq=TRUE) +
+    ylim(0,9)
 ## remove the legend from weighted.fig3B.
-weighted.fig3B <- weighted.fig3B + guides(fill=FALSE) 
+weighted.fig3B <- weighted.fig3B + guides(fill = "none") 
+
+## IMPORTANT NOTE: This may be an overestimate, since I need to subtract mutations in the ancestor.
+weighted.fig3C <- plot.mutations.stackbar(B20.mutation.class.df, panel="No plasmid", weight.by.freq=TRUE) + ylim(0,9)
+weighted.fig3D <- plot.mutations.stackbar(B20.mutation.class.df, panel="p15A", weight.by.freq=TRUE) + ylim(0,9)
+weighted.fig3E <- plot.mutations.stackbar(B20.mutation.class.df, panel="pUC", weight.by.freq=TRUE) + ylim(0,9)
+
 
 weighted.fig3 <- plot_grid(weighted.fig3A,weighted.fig3B,legend,
-                  labels=c('A','B',''),
-                  nrow=1)
+                           weighted.fig3C, weighted.fig3D, weighted.fig3E,
+                           labels=c('A','B',"",
+                                    "C","D","E"),
+                           ncol=3,
+                           nrow=2)
 
 weighted.fig3.output <- "../results/draft-manuscript-1A/weighted-mutation-classes.pdf"
 ggsave(weighted.fig3, file=weighted.fig3.output,width=8,height=7)
@@ -238,7 +315,7 @@ make.summed.plot <- function(df, number.of.bins = 46) {
 
 
 make.facet.mut.plot <- function(df) {
-    make.summed.plot(df) + facet_wrap(.~Plasmid,scales="free",nrow=4) 
+    make.summed.plot(df) + facet_wrap(Plasmid~Transposon,scales="free",nrow=4) 
 }
 
 
@@ -254,7 +331,7 @@ make.spectrum.plot <- function(spectrum.df,weight.by.freq=FALSE) {
     p <- p +
         geom_bar(stat='identity') +
         theme_classic() +
-        facet_wrap(Plasmid~.,scales="free") + 
+        facet_wrap(Plasmid~Transposon,scales="free") + 
         xlab("Population") +
         theme(legend.position="bottom")
     return(p)
@@ -273,7 +350,7 @@ make.spectrum.class.plot <- function(spectrum.df,weight.by.freq=FALSE) {
     
     p <- p + geom_bar(stat='identity') +
         theme_classic() +
-        facet_wrap(Plasmid~.,scales="free") + 
+        facet_wrap(Plasmid~Transposon,scales="free") + 
         xlab("Population") +
         theme(legend.position="bottom")
     return(p)
@@ -320,7 +397,7 @@ Fig5B <- make.spectrum.class.plot(point.mut.spectrum.class.df) + ylim(0, 15)
 Fig5 <- plot_grid(Fig5A, Fig5B, labels = c('A','B'),nrow=1)
 
 ggsave("../results/draft-manuscript-1A/mutation-dynamics.pdf",
-       Fig5, width=7, height=5)
+       Fig5, width=10, height=10)
 
 ## repeat, but weigh by allele frequency.
 
@@ -334,7 +411,7 @@ weighted.Fig5 <- plot_grid(weighted.Fig5A, weighted.Fig5B,
                            labels = c('A','B'),nrow=1) 
 
 ggsave("../results/draft-manuscript-1A/weighted-mutation-dynamics.pdf",
-       weighted.Fig5, width=7, height=5)
+       weighted.Fig5, width=10, height=10)
 
 #####################################################################################
 
@@ -399,7 +476,7 @@ DNA.repair.parallel.nuc <- DNA.repair.muts %>%
     group_by(Gene, Position) %>% summarize(count=n()) %>%
     arrange(desc(count)) %>% filter(count>1)
 
-## parallelism at mutL, dnaC, dnaX, recE, uvrA.
+## no evidence of parallel evolution.
 DNA.repair.parallel.gene <- DNA.repair.muts %>%
     group_by(Gene) %>% summarize(count=n()) %>%
     arrange(desc(count)) %>% filter(count>1)
@@ -433,7 +510,7 @@ gene.level.parallel.mutations <- evolved.mutations %>% group_by(Gene) %>%
 summarise(count = n()) %>% filter(count>1) %>% inner_join(evolved.mutations)
 
 parallel.genes <- gene.level.parallel.mutations %>%
-    select(Gene, count, Plasmid) %>%
+    select(Gene, count, Plasmid, Transposon) %>%
     distinct() %>%
     arrange(desc(count))
 
@@ -514,28 +591,35 @@ MakeMutCountMatrixFigure <- function(evolved.mutations, pop.clone.labels, show.a
                                          "#fb8072", "#80b1d3", "#fdb462"))
         
         if (leg == FALSE) {
-            fig <- fig + guides(fill=FALSE)
+            fig <- fig + guides(fill= "none")
         }
         return(fig)
     }
-    
-    
+
+    B20.noPlasmid.matrix.panel <- make.matrix.panel(matrix.data,"B20_None")
+    B20.A31.matrix.panel <- make.matrix.panel(matrix.data,"B20_p15A")
+    B20.A18.matrix.panel <- make.matrix.panel(matrix.data,"B20_pUC")
+
     B30.noPlasmid.matrix.panel <- make.matrix.panel(matrix.data,"B30_None")
     B30.A18.matrix.panel <- make.matrix.panel(matrix.data,"B30_pUC")
     
-    matrix.figure <- plot_grid(B30.noPlasmid.matrix.panel,
-                               B30.A18.matrix.panel,
-                               nrow=1,
-                               align = 'vh')
+    matrix.figure <- plot_grid(
+        B20.noPlasmid.matrix.panel,
+        B20.A31.matrix.panel,    
+        B20.A18.matrix.panel,
+        B30.noPlasmid.matrix.panel,
+        B30.A18.matrix.panel,
+        nrow=1,
+        align = 'vh')
     return(matrix.figure)
 }
 
 Fig6 <- MakeMutCountMatrixFigure(evolved.mutations, pop.clone.labels)
 matrix.outf <- "../results/draft-manuscript-1A/Fig6.pdf"
-ggsave(matrix.outf, Fig6,width=10)
+ggsave(matrix.outf, Fig6,width=20)
 
 Fig6singles <- MakeMutCountMatrixFigure(evolved.mutations, pop.clone.labels, show.all=T)
-ggsave("../results/draft-manuscript-1A/Fig6-singles.pdf", Fig6singles,width=10)
+ggsave("../results/draft-manuscript-1A/Fig6-singles.pdf", Fig6singles,width=20, height=20)
 
 
 ## Redo, but used summed allele frequency for the heatmap.
@@ -607,29 +691,39 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.mutations, pop.clone.l
 
         
         if (leg == FALSE) {
-            fig <- fig + guides(fill=FALSE)
+            fig <- fig + guides(fill= "none")
         }
         return(fig)
     }
     
+
+    B20.noPlasmid.matrix.panel <- make.allele.freq.matrix.panel(matrix.data,"B20_None")
+    B20.A31.matrix.panel <- make.allele.freq.matrix.panel(matrix.data,"B20_p15A")
+    B20.A18.matrix.panel <- make.allele.freq.matrix.panel(matrix.data,"B20_pUC")
+
     
-    B30.noPlasmid.panel <- make.allele.freq.matrix.panel(matrix.data,"B30_None")
-    B30.A18.panel <- make.allele.freq.matrix.panel(matrix.data,"B30_pUC")
-    
-    figure <- plot_grid(B30.noPlasmid.panel,
-                               B30.A18.panel,
-                               nrow=1,
-                               align = 'vh')
-    return(figure)
+    B30.noPlasmid.matrix.panel <- make.allele.freq.matrix.panel(matrix.data,"B30_None")
+    B30.A18.matrix.panel <- make.allele.freq.matrix.panel(matrix.data,"B30_pUC")
+
+    matrix.figure <- plot_grid(
+        B20.noPlasmid.matrix.panel,
+        B20.A31.matrix.panel,    
+        B20.A18.matrix.panel,
+        B30.noPlasmid.matrix.panel,
+        B30.A18.matrix.panel,
+        nrow=1,
+        align = 'vh')
+    return(matrix.figure)
+
 }
 
 Fig7 <- MakeSummedAlleleFrequencyMatrixFigure(evolved.mutations, pop.clone.labels)
 allele.freq.matrix.outf <- "../results/draft-manuscript-1A/Fig7.pdf"
-ggsave(allele.freq.matrix.outf, Fig7, width=10)
+ggsave(allele.freq.matrix.outf, Fig7, width=20)
 
 
 Fig7singles <- MakeSummedAlleleFrequencyMatrixFigure(evolved.mutations, pop.clone.labels, show.all=T)
-ggsave("../results/draft-manuscript-1A/Fig7-singles.pdf", Fig7singles,width=10)
+ggsave("../results/draft-manuscript-1A/Fig7-singles.pdf", Fig7singles,height=20, width=20)
 
 ###########################################################
 
@@ -650,10 +744,10 @@ total.allele.frequency.summary <- evolved.mutations %>%
     ungroup()
 
 pUC.treatment.total.allele.frequencies <- total.allele.frequency.summary %>%
-    filter(Treatment == "B30_pUC")
+    filter(Plasmid == "pUC")
 
 noPlasmid.treatment.total.allele.frequencies <- total.allele.frequency.summary %>%
-    filter(Treatment == "B30_None")
+    filter(Plasmid == "None")
 
 ## two-tailed Mann-Whitney U-test: no difference in numbers of mutations
 ## or summed allele frequencies between treatments. BUT note that
