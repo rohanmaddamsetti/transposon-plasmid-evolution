@@ -151,7 +151,7 @@ Kᵣ = 1 ## units of (μM)
 
 ## These parameters are used in equation S15.
 ## TetA-Tc activity relative to Tc permeability in strain Ta1
-V₀_κ_ratio = 100##4.2
+V₀_κ_ratio = 4.2
 ## Michaelis constant for TetA efflux pump and Tc
 Kₘ = 10 ## units of (μM)
 ## growth half-inhibition constant for Tc
@@ -161,7 +161,7 @@ I₅₀ = 4.2 ## units of (μM)
 end
 
 # ╔═╡ 9deac3a4-4691-4e7e-a974-f70a77706df4
-## Let's solve equation S15 for internalTet given externalTet.
+## We can invert equation S15 for internalTet given externalTet.
 function invertS15!(F, x) 
 	internalTet = x[1] ## F and x must be vectors.
 	externalTet = x[2]
@@ -172,11 +172,17 @@ function invertS15!(F, x)
 end
 
 # ╔═╡ ad8ea82a-7d99-4aa2-8890-1e990830eb7e
-function solve_for_internal_tet(externTet, V₀_κ_ratio, Kₘ, I₅₀)
+function invert_for_internal_tet(externTet, V₀_κ_ratio, Kₘ, I₅₀)
 	## This is just a nice wrapper function.
 	internal_tet_solution = nlsolve(invertS15!, [1.0, externTet, V₀_κ_ratio, Kₘ, I₅₀])
 	internalTet = internal_tet_solution.zero[1]
 	return internalTet
+end
+
+# ╔═╡ b0235a4f-4ba8-48a5-958d-443d90db1c6c
+## given an internalTet concentration, find the externalTet.
+function runS15(internalTet, V₀_κ_ratio, Kₘ, I₅₀)
+
 end
 
 # ╔═╡ e57accd6-6c33-4427-b1e8-3d1c587b63f5
@@ -191,7 +197,7 @@ md""" let's make a plot to see if the curves recapitulate Figure 5A. Note that t
 begin
 
 	externalTetVec = collect(0:0.1:10.0)
-	internalTetVec = [solve_for_internal_tet(x, V₀_κ_ratio, Kₘ, I₅₀) for x in externalTetVec]
+	internalTetVec = [invert_for_internal_tet(x, V₀_κ_ratio, Kₘ, I₅₀) for x in externalTetVec]
 	RelativeGrowthRateVec = [RelativeGrowthRateEqS5(x, I₅₀) for x in internalTetVec]
 
 end
@@ -1930,6 +1936,7 @@ version = "0.9.1+5"
 # ╠═d2fa70b0-a02f-4ae5-a425-70866eaf1e73
 # ╠═9deac3a4-4691-4e7e-a974-f70a77706df4
 # ╠═ad8ea82a-7d99-4aa2-8890-1e990830eb7e
+# ╠═b0235a4f-4ba8-48a5-958d-443d90db1c6c
 # ╠═e57accd6-6c33-4427-b1e8-3d1c587b63f5
 # ╟─e0e85568-56c0-4200-90dd-72dc12b0c43e
 # ╠═e8497b49-8331-46b0-8148-d7c12bb42589

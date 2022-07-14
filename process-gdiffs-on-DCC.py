@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 """
-process-gdiffs.py by Rohan Maddamsetti.
+process-gdiffs-on-DCC.py by Rohan Maddamsetti.
 
 I take the evolved genomes, and write out evolved-mutations.csv for
 downstream analysis in R.
 
-Usage: python process-gdiffs.py
+This version is for DCC: the paths do not have 'draft-manuscript-1A' in them.
+The vanilla version is process-gdiffs.py, which is for running on my laptop.
+
+Usage: python process-gdiffs-on-DCC.py
 
 """
 
@@ -34,7 +37,6 @@ def write_evolved_pop_mutations(evol_pop_labels, mixed_pop_paths, outf):
                 plasmid = my_row["Plasmid"]
                 tet = str(int(my_row["Tet"]))
                 population = str(int(my_row["Population"]))
-                
 
                 gd = genomediff.GenomeDiff.read(infh)
                 muts = gd.mutations
@@ -66,10 +68,10 @@ def main():
     projdir = dirname(srcdir)
     assert projdir.endswith("transposon-plasmid-evolution")
 
-    genome_results_dir = join(projdir,"results","draft-manuscript-1A","genome-analysis")
+    genome_results_dir = join(projdir,"results","genome-analysis")
     breseq_pops_results_dir = join(genome_results_dir,"mixed-pops")
 
-    pop_clone_label_f = join(projdir,"data","draft-manuscript-1A","evolved-populations-and-clones.csv")
+    pop_clone_label_f = join(projdir,"data","evolved-populations-and-clones.csv")
     
     all_pop_clone_labels = pd.read_csv(pop_clone_label_f)
 

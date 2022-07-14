@@ -107,38 +107,38 @@
 ## Now let's assemble the DH5a + B20 evolved populations.
 
 ## RM7.4.31-35 are DH5a + B20 evolved pops 1-5.
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-31 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_31/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-31 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_31/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-32 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_32/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-32 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_32/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-33 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_33/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-33 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_33/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-34 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_34/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-34 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_34/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-35 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_35/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-35 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_35/*.fastq.gz"
 
 ## RM7.4.36-40 are DH5a + B20 + A18 evolved pops 1-5.
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-36 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_36/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-36 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_36/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-37 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_37/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-37 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_37/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-38 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_38/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-38 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_38/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-39 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_39/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-39 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_39/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-40 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_40/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-40 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_40/*.fastq.gz"
 
 
 ## RM7.4.41-45 are DH5a + B30 + A31 evolved pops 1-5.
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-41 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_41/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-41 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_41/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-42 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_42/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-42 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_42/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-43 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_43/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-43 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_43/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-44 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_44/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-44 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_44/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-45 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_45/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-4-45 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_4_45/*.fastq.gz"
 
 
 ################################################################################
@@ -147,7 +147,7 @@ sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorph
 
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-6 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_6/*.fastq.gz"
 
-##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-7 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_7/*.fastq.gz"
+sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-7 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_7/*.fastq.gz"
 
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-8 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_8/*.fastq.gz"
 
@@ -200,9 +200,9 @@ sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorph
 ## RM7.72.30-34 is B20+noplasmid (Tet 0 control populations).
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-30 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_30/*.fastq.gz"
 
-##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-31 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_31/*.fastq.gz"
+sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-31 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_31/*.fastq.gz"
 
-##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-32 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_32/*.fastq.gz"
+sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-32 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_32/*.fastq.gz"
 
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-33 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_33/*.fastq.gz"
 
@@ -211,7 +211,7 @@ sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorph
 ## RM7.72.35-39 is B30 + A31 (Tet 0 control populations).
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-35 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_35/*.fastq.gz"
 
-##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-36 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_36/*.fastq.gz"
+sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-36 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_36/*.fastq.gz"
 
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-37 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_37/*.fastq.gz"
 
