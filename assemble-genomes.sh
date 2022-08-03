@@ -7,48 +7,48 @@
 
 
 ################################################################################
-## first, assemble the ancestral genomes using the NEB5-alpha-NZ_CP053607.gb reference genome.
+## first, assemble the ancestral genomes using the NEB5-alpha-NZ_CP017100.gb reference genome.
 
-## assemble the B30 + pUC ancestral strain RM6-176-18 using the NEB5-alpha-NZ_CP053607.gb reference genome.
-##sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM6-176-18 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb -r ../data/genome-sequencing/A18-pUC.gb ../data/genome-sequencing/MiGS_RohanMaddamsetti210805/RM6_176_18/*.fastq.gz"
+## assemble the B30 + pUC ancestral strain RM6-176-18 using the NEB5-alpha-NZ_CP017100.gb reference genome.
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM6-176-18 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb -r ../data/genome-sequencing/A18-pUC.gb ../data/genome-sequencing/MiGS_RohanMaddamsetti210805/RM6_176_18/*.fastq.gz"
 
-## assemble the B30 ancestral strain RM6-200-6 using the NEB5-alpha-NZ_CP053607.gb reference genome.
-##sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM6-200-6 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb ../data/genome-sequencing/MiGS_RohanMaddamsetti210917/RM6_200_6/*.fastq.gz"
+## assemble the B30 ancestral strain RM6-200-6 using the NEB5-alpha-NZ_CP017100.gb reference genome.
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM6-200-6 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb ../data/genome-sequencing/MiGS_RohanMaddamsetti210917/RM6_200_6/*.fastq.gz"
 
-## assemble the B30 + p15A ancestral strain using the NEB5-alpha-NZ_CP053607.gb reference genome.
-##sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-72-1 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb  -r ../data/genome-sequencing/A31-p15A.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_1/*.fastq.gz"
+## assemble the B30 + p15A ancestral strain using the NEB5-alpha-NZ_CP017100.gb reference genome.
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-72-1 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb  -r ../data/genome-sequencing/A31-p15A.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_1/*.fastq.gz"
 
-## assemble the B20 + pUC ancestral strain using the NEB5-alpha-NZ_CP053607.gb reference genome.
-##sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-72-2 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb  -r ../data/genome-sequencing/A18-pUC.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_2/*.fastq.gz"
+## assemble the B20 + pUC ancestral strain using the NEB5-alpha-NZ_CP017100.gb reference genome.
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-72-2 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb  -r ../data/genome-sequencing/A18-pUC.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_2/*.fastq.gz"
 
-## assemble the B20 ancestral strain using the NEB5-alpha-NZ_CP053607.gb reference genome.
-##sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-72-3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_3/*.fastq.gz"
+## assemble the B20 ancestral strain using the NEB5-alpha-NZ_CP017100.gb reference genome.
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-72-3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_3/*.fastq.gz"
 
-## assemble the B20 + p15A ancestral strain using the NEB5-alpha-NZ_CP053607.gb reference genome.
-##sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-72-4 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb  -r ../data/genome-sequencing/A31-p15A.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_4/*.fastq.gz"
+## assemble the B20 + p15A ancestral strain using the NEB5-alpha-NZ_CP017100.gb reference genome.
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-72-4 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb  -r ../data/genome-sequencing/A31-p15A.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_4/*.fastq.gz"
 
 ################################################################################
-## apply mutations in the ancestral B30+A18 genome, RM6-176-18, to the NEB5-alpha-NZ_CP053607.gb reference genome.
+## apply mutations in the ancestral B30+A18 genome, RM6-176-18, to the NEB5-alpha-NZ_CP017100.gb reference genome.
 
 ## NOTE: the output GFF3 files are combined references for the chromosome, the transposon, and the plasmid.
 
-##gdtools APPLY -o ../results/genome-analysis/RM6-176-18.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb -r ../data/genome-sequencing/A18-pUC.gb  ../results/genome-analysis/RM6-176-18/output/output.gd
+##gdtools APPLY -o ../results/genome-analysis/RM6-176-18.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb -r ../data/genome-sequencing/A18-pUC.gb  ../results/genome-analysis/RM6-176-18/output/output.gd
 
-## apply mutations in the ancestral B30+noplasmid genome, RM6-200-6, to the NEB5-alpha-NZ_CP053607.gb reference genome.
+## apply mutations in the ancestral B30+noplasmid genome, RM6-200-6, to the NEB5-alpha-NZ_CP017100.gb reference genome.
 
-##gdtools APPLY -o ../results/genome-analysis/RM6-200-6.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb ../results/genome-analysis/RM6-200-6/output/output.gd
+##gdtools APPLY -o ../results/genome-analysis/RM6-200-6.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb ../results/genome-analysis/RM6-200-6/output/output.gd
 
-## apply mutations in the ancestral B30+A31 genome, RM7-72-1, to the NEB5-alpha-NZ_CP053607.gb reference genome.
-##gdtools APPLY -o ../results/genome-analysis/RM7-72-1.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb -r ../data/genome-sequencing/A31-p15A.gb  ../results/genome-analysis/RM7-72-1/output/output.gd
+## apply mutations in the ancestral B30+A31 genome, RM7-72-1, to the NEB5-alpha-NZ_CP017100.gb reference genome.
+##gdtools APPLY -o ../results/genome-analysis/RM7-72-1.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb -r ../data/genome-sequencing/A31-p15A.gb  ../results/genome-analysis/RM7-72-1/output/output.gd
 
-## apply mutations in the ancestral B20+pUC genome, RM7-72-2, to the NEB5-alpha-NZ_CP053607.gb reference genome.
-##gdtools APPLY -o ../results/genome-analysis/RM7-72-2.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb -r ../data/genome-sequencing/A18-pUC.gb  ../results/genome-analysis/RM7-72-2/output/output.gd
+## apply mutations in the ancestral B20+pUC genome, RM7-72-2, to the NEB5-alpha-NZ_CP017100.gb reference genome.
+##gdtools APPLY -o ../results/genome-analysis/RM7-72-2.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb -r ../data/genome-sequencing/A18-pUC.gb  ../results/genome-analysis/RM7-72-2/output/output.gd
 
-## apply mutations in the ancestral B20+noplasmid genome, RM7-72-3, to the NEB5-alpha-NZ_CP053607.gb reference genome.
-##gdtools APPLY -o ../results/genome-analysis/RM7-72-3.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb ../results/genome-analysis/RM7-72-3/output/output.gd
+## apply mutations in the ancestral B20+noplasmid genome, RM7-72-3, to the NEB5-alpha-NZ_CP017100.gb reference genome.
+##gdtools APPLY -o ../results/genome-analysis/RM7-72-3.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb ../results/genome-analysis/RM7-72-3/output/output.gd
 
-## apply mutations in the ancestral B20+p15A genome, RM7-72-4, to the NEB5-alpha-NZ_CP053607.gb reference genome.
-##gdtools APPLY -o ../results/genome-analysis/RM7-72-4.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP053607.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb -r ../data/genome-sequencing/A31-p15A.gb  ../results/genome-analysis/RM7-72-4/output/output.gd
+## apply mutations in the ancestral B20+p15A genome, RM7-72-4, to the NEB5-alpha-NZ_CP017100.gb reference genome.
+##gdtools APPLY -o ../results/genome-analysis/RM7-72-4.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B20-miniTn5-TetA.gb -r ../data/genome-sequencing/A31-p15A.gb  ../results/genome-analysis/RM7-72-4/output/output.gd
 
 ################################################################################
 ## now, test the new references, by re-mapping reads.
@@ -147,7 +147,7 @@
 
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-6 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_6/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-7 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_7/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-7 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_7/*.fastq.gz"
 
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-8 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_8/*.fastq.gz"
 
@@ -200,9 +200,9 @@ sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorp
 ## RM7.72.30-34 is B20+noplasmid (Tet 0 control populations).
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-30 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_30/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-31 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_31/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-31 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_31/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-32 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_32/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-32 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_32/*.fastq.gz"
 
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-33 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_33/*.fastq.gz"
 
@@ -211,7 +211,7 @@ sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorp
 ## RM7.72.35-39 is B30 + A31 (Tet 0 control populations).
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-35 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_35/*.fastq.gz"
 
-sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-36 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_36/*.fastq.gz"
+##sbatch -p scavenger -t 16:00:00 --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-36 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_36/*.fastq.gz"
 
 ##sbatch -p scavenger -t 16:00:00 --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 --base-quality-cutoff 10 -o ../results/genome-analysis/RM7-72-37 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_37/*.fastq.gz"
 

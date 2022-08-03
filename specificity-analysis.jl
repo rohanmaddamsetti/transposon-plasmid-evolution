@@ -30,11 +30,12 @@ function GeneSpecificityFisherTest(specificity_summary, gene, treatment1, treatm
     Number of metagenomes w/  mutations in gene x   |  A  |  B
     Number of metagenomes w/o mutations in gene x  |  C |  D
 
-Possible values for the treatment_strs: (TODO: sequence B30_p15A)
+Possible values for the treatment_strs:
 B20_None
 B20_p15A
 B20_pUC
 B30_None
+B30_p15A
 B30_pUC
     """
     
@@ -241,11 +242,12 @@ evolved_mutations = CSV.read(
 @rtransform!(evolved_mutations, :Treatment = :Transposon * "_" * :Plasmid)
 
 B20_noPlasmid_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_None")
-B20_pUC_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_pUC")
 B20_p15A_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_p15A")
+B20_pUC_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_pUC")
 
-B30_pUC_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_pUC")
 B30_noPlasmid_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_None")
+B30_p15A_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_p15A")
+B30_pUC_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_pUC")
 ###############################################################################
 ## Gene-specific specificity analyses. Use Fisher's exact test, and extensions
 ## to metagenomic data.

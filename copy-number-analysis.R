@@ -15,23 +15,25 @@
 
 ## 5) return copy number and boundaries for each significant amplification.
 
-## (so far, there are no significant amplifications).
-
-library(xml2)
-library(assertthat)
-library(IRanges)
-library(GenomicRanges)
-library(rtracklayer)
-
 library(tidyverse)
 library(scales)      # pairs nicely with ggplot2 for plot label formatting
 library(gridExtra)   # a helper for arranging individual ggplot objects
 library(ggthemes)    # has a clean theme for ggplot2
-library(viridis)     # best. color. palette. evar.
+library(viridis)
 library(DT)          # prettier data.frame output
 library(data.table)  # faster fread()
 library(dtplyr)      # dplyr works with data.table now.
 library(cowplot)     # layout figures nicely.
+library(xml2)
+library(assertthat)
+
+## Bioconductor dependencies
+library(IRanges)
+library(GenomicRanges)
+
+## this one doesn't seem to work for arm64. maybe I don't need it anymore??
+##library(rtracklayer)
+
 
 #' parse the summary.html breseq output file, and return the mean and dispersion
 #' of the negative binomial fit to the read coverage distribution, returned as a
@@ -251,22 +253,33 @@ plot.amp.segments <- function(annotated.amps,clone.labels) {
     return(segmentplot)
 }
 
+#######################################
+## Analysis time!
+
 ## assert that we are in the src directory, such that
 ## proj.dir is the parent of the current directory.
 stopifnot(endsWith(getwd(), file.path("transposon-plasmid-evolution","src")))
 projdir <- file.path("..")
 
-outdir <- file.path(projdir, "results", "draft-manuscript-1A")
-breseq.output.dir <- file.path(projdir, "results", "draft-manuscript-1A", "genome-analysis", "mixed-pops")
-RM6.200.6.gff3 <- file.path(projdir,"results", "draft-manuscript-1A", "genome-analyss", "RM6-200-6.gff3")
-all.genomes <- list.files(breseq.output.dir,pattern='^RM')
+## get metadata for all the evolved population metagenomes.
+metagenome.metadata <- read.csv("../data/draft-manuscript-1A/evolved-populations-and-clones.csv")
 
-all.genome.paths <- sapply(all.genomes, function(x) file.path(breseq.output.dir,x))
-genome.input.df <- data.frame(Genome=all.genomes,path=all.genome.paths)
+mixedpop.output.dir <- file.path(projdir, "results", "draft-manuscript-1A", "genome-analysis", "mixed-pops")
+all.mixedpops <- list.files(mixedpop.output.dir,pattern='^RM')
+all.mixedpop.paths <- sapply(all.genomes, function(x) file.path(mixedpop.output.dir,x))
+mixedpop.input.df <- data.frame(Sample=all.mixedpops, path=all.mixedpop.paths) %>%
+    ## skip the two clone samples for now.
+    inner_join(metagenome.metadata)
 
-amps <- map2_df(genome.input.df$path,
-                genome.input.df$Genome,
-                find.amplifications) %>%
-    ungroup()
+
+## test code on some small cases.
+breseq.output.dir <- mixedpop.input.df$path[1]
+
+
+## Find amplifications in all the genomes.
+##amps <- map2_df(genome.input.df$path,
+ ##               genome.input.df$Genome,
+  ##              find.amplifications) %>%
+   ## ungroup()
 
 
