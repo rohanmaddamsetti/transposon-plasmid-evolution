@@ -1,12 +1,7 @@
 ## transposon-to-plasmid-metagenomics.R by Rohan Maddamsetti.
 
-## IMPORTANT TODO:
-## re-run breseq using the most applicable reference genome listed here:
+## Here's a list of NEB reference genomes. I use the most recent version of NEB5-alpha as reference.
 ## https://international.neb.com/tools-and-resources/usage-guidelines/competent-e-coli-genome-sequences-tool
-
-## I believe I am inadvertently using an NEB50alpha F’ (lacIq) reference genome,
-## rather than the vanilla NEB 5-alpha reference genome.
-## I doubt this will make a substantial difference, but good to get it right.
 
 library(tidyverse)
 library(cowplot)

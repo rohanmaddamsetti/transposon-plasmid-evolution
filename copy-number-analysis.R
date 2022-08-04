@@ -41,18 +41,46 @@ library(GenomicRanges)
 #' NOTE: this code has only been tested on the summary file
 #' output by breseq 0.30.0. It might fail on earlier or later versions.
 
-coverage.nbinom.from.html <- function(breseq.output.dir) {
+coverage.nbinom.from.html <- function(breseq.output.dir, sample.has.plasmid=TRUE) {
     summary.html.f <- file.path(breseq.output.dir, "output", "summary.html")
     tree <- read_html(summary.html.f)
     ## print text in the table 'Reference Sequence Information.
     query <- '//table[./tr/th[contains(text(),"fit dispersion")]]'
     table <- xml_find_first(tree,query)
     table.data <- xml_find_all(table,'./tr/td')
-    avg <- as.numeric(xml_text(table.data[5]))
-    dispersion <- as.numeric(xml_text(table.data[6]))
-    print(paste('mean coverage is:',avg))
-    print(paste('dispersion is:',dispersion))
-    return(data.frame('mean'=avg,'dispersion'=dispersion,'variance'=avg*dispersion))
+    chromosome.avg <- as.numeric(xml_text(table.data[5]))
+    chromosome.dispersion <- as.numeric(xml_text(table.data[6]))
+    print(paste('mean chromosome coverage is:', chromosome.avg))
+    print(paste('chromosome dispersion is:', chromosome.dispersion))
+    transposon.avg <- as.numeric(xml_text(table.data[13]))
+    transposon.dispersion <- as.numeric(xml_text(table.data[14]))
+    print(paste('mean transposon coverage is:', transposon.avg))
+    print(paste('transposon dispersion is:', transposon.dispersion))
+
+    ## all samples should have these data.
+    coverage.df <- data.frame('Sample' = basename(breseq.output.dir),
+                              'mean'=c(chromosome.avg, transposon.avg),
+                              'dispersion'=c(chromosome.dispersion, transposon.dispersion),
+                              'variance'=c(chromosome.avg * chromosome.dispersion,
+                                           transposon.avg * transposon.dispersion),
+                              'replicon'=c("chromosome", "transposon"))
+
+    if (sample.has.plasmid) {
+            plasmid.avg <- as.numeric(xml_text(table.data[21]))
+            plasmid.dispersion <- as.numeric(xml_text(table.data[22]))
+            print(paste('mean plasmid coverage is:', plasmid.avg))
+            print(paste('plasmid dispersion is:', plasmid.dispersion))
+
+            plasmid.coverage.df <- data.frame('Sample' = basename(breseq.output.dir),
+                                              'mean' = plasmid.avg,
+                                              'dispersion' = plasmid.dispersion,
+                                              'variance' = plasmid.avg * plasmid.dispersion,
+                                              'replicon' = "plasmid")
+            ## now join the plasmid coverage data.
+            coverage.df <- rbind(coverage.df, plasmid.coverage.df)
+    }
+    
+    return(coverage.df)
 }
 
 #' get the maximum length of a sequencing read from the summary.html breseq
@@ -77,17 +105,18 @@ max.readlen.from.html <- function(breseq.output.dir) {
 #' a corrected bonferroni. max.read.len ensures positions cannot be spanned by a single Illumina read.
 #' Estimate copy number by dividing mean coverage in each region by the mean of the H0 1x coverage distribution.
 #' return mean copy number, and boundaries for each region that passes the amplification test.
-find.amplifications <- function(breseq.output.dir, gnome) { #gnome is not a misspelling.
+find.chromosomal.amplifications <- function(breseq.output.dir, gnome) { #gnome is not a misspelling.
     
     gnome <- as.character(gnome)
     print(gnome)
     ## Use xml2 to get negative binomial fit and dispersion from
     ## breseq output summary.html. This is H0 null distribution of 1x coverage.
-    nbinom.fit <- coverage.nbinom.from.html(breseq.output.dir)
+    nbinom.fit <- coverage.nbinom.from.html(breseq.output.dir) %>%
+        filter(replicon=="chromosome")
     
     ## Use xml2 to get max read length from summary.html.
     max.read.len <- max.readlen.from.html(breseq.output.dir)
-    genome.length <- 4584653 ## length of NZ_CP053607 reference.
+    genome.length <- 4583637 ## length of NEB5-alpha-NZ_CP017100 reference.
     
     alpha <- 0.05
     uncorrected.threshold <- qnbinom(p=alpha,mu=nbinom.fit$mean,size=nbinom.fit$dispersion,lower.tail=FALSE)
@@ -164,14 +193,13 @@ find.amplifications <- function(breseq.output.dir, gnome) { #gnome is not a miss
     return(significant.amplifications)
 }
 
-## input: LCA.gbk: file.path of the reference genome,
+## input: ancestor.gff: file.path of the ancestral genome
 ##    amplifications: data.frame returned by find.amplifications.
-annotate.amplifications <- function(amplifications,LCA.gff) {
-    
+annotate.amplifications <- function(amplifications, ancestor.gff) {
     ## create the IRanges object.
     amp.ranges <- IRanges(amplifications$left.boundary,amplifications$right.boundary)
-    ## Turn into a GRanges object in order to find overlaps with REL606 genes.
-    g.amp.ranges <- GRanges("NZ_CP053607",ranges=amp.ranges)
+    ## Turn into a GRanges object in order to find overlaps with NEB5-alpha genes.
+    g.amp.ranges <- GRanges("NZ_CP017100",ranges=amp.ranges)
     ## and add the data.frame of amplifications as metadata.
     mcols(g.amp.ranges) <- amplifications
     
@@ -272,14 +300,53 @@ mixedpop.input.df <- data.frame(Sample=all.mixedpops, path=all.mixedpop.paths) %
     inner_join(metagenome.metadata)
 
 
-## test code on some small cases.
-breseq.output.dir <- mixedpop.input.df$path[1]
+## Find chromosomal amplifications in all samples.
+amps <- map2_df(mixedpop.input.df$path,
+                mixedpop.input.df$Sample,
+                find.chromosomal.amplifications) %>%
+    ungroup()
+
+### TODO: finish the analysis of copy number variation in these samples.
 
 
-## Find amplifications in all the genomes.
-##amps <- map2_df(genome.input.df$path,
- ##               genome.input.df$Genome,
-  ##              find.amplifications) %>%
-   ## ungroup()
+## Plot the plasmid/chromosome and transposon/chromosome ratio in each sample.
+replicon.coverage.df <- map_dfr(.x = mixedpop.input.df$path, .f = coverage.nbinom.from.html) %>%
+    inner_join(metagenome.metadata) %>%
+    ## I am not examining dispersion or variance at this point.
+    select(Sample, mean, replicon, Transposon, Plasmid, Population, Tet)
 
+replicon.coverage.ratio.df <- replicon.coverage.df %>%
+    pivot_wider(names_from = replicon, values_from = mean, names_prefix = "mean_") %>%
+    group_by(Sample, Transposon, Plasmid, Population, Tet) %>%
+    summarise(transposons.per.chromosome = (mean_transposon/mean_chromosome),
+              plasmids.per.chromosome = (mean_plasmid/mean_chromosome),
+              transposons.per.plasmid = (mean_transposon/mean_plasmid)) %>%
+    pivot_longer(cols = c(transposons.per.chromosome,plasmids.per.chromosome,transposons.per.plasmid),
+                 names_to = "ratio_type", values_to = "ratio")
 
+Tet50.ratio.plot <- replicon.coverage.ratio.df %>%
+    filter(Tet == 50) %>%
+    ggplot(aes(y = ratio, x = Plasmid, color = ratio_type, shape = Transposon)) +
+    geom_point() +
+    theme_classic() +
+    facet_wrap(ratio_type~Transposon, scales = "free") +
+    theme(strip.background = element_blank()) +
+    ggtitle("50 ug/mL tetracycline, Day 9") +
+    guides(color= "none", shape = "none")
+
+Tet0.ratio.plot <- replicon.coverage.ratio.df %>%
+    filter(Tet == 0) %>%
+    ggplot(aes(y = ratio, x = Plasmid, color = ratio_type, shape = Transposon)) +
+    geom_point() +
+    theme_classic() +
+    facet_wrap(ratio_type~Transposon, scales = "free") +
+    theme(strip.background = element_blank()) +
+    ggtitle("0 ug/mL tetracycline, Day 9") +
+    guides(color = "none", shape = "none")
+
+ratio.figure.Fig8 <- plot_grid(Tet50.ratio.plot, Tet0.ratio.plot, labels=c('A','B'),nrow=2)
+ggsave("../results/draft-manuscript-1A/Fig8.pdf", ratio.figure.Fig8)
+
+## let's write out the table too.
+write.csv(replicon.coverage.ratio.df, "../results/draft-manuscript-1A/plasmid-transposon-coverage-ratios.csv",
+          quote=F, row.names=FALSE)
