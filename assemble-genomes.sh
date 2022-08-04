@@ -53,17 +53,17 @@
 ################################################################################
 ## now, test the new references, by re-mapping reads.
 
-sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/remapped-RM6-176-18 -r ../results/genome-analysis/RM6-176-18.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210805/RM6_176_18/*.fastq.gz"
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/clones/remapped-RM6-176-18 -r ../results/genome-analysis/RM6-176-18.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210805/RM6_176_18/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/remapped-RM6-200-6 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210917/RM6_200_6/*.fastq.gz"
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/clones/remapped-RM6-200-6 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210917/RM6_200_6/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/remapped-RM7-72-1 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_1/*.fastq.gz"
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/clones/remapped-RM7-72-1 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_1/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/remapped-RM7-72-2 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_2/*.fastq.gz"
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/clones/remapped-RM7-72-2 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_2/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/remapped-RM7-72-3 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_3/*.fastq.gz"
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/clones/remapped-RM7-72-3 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_3/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/remapped-RM7-72-4 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_4/*.fastq.gz"
+sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/clones/remapped-RM7-72-4 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_4/*.fastq.gz"
 
 
 ################################################################################
