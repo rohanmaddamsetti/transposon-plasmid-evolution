@@ -1,5 +1,7 @@
 ##copy-number-analysis.R by Rohan Maddamsetti.
 
+## CRITICAL TODO: get the copy number code working once Bioconductor has an ARM64 release for mac.
+
 ## 1) use xml2 to get negative binomial fit and dispersion from
 ## breseq output summary.html. This is H0 null distribution of 1x coverage.
 
@@ -31,8 +33,8 @@ library(assertthat)
 library(IRanges)
 library(GenomicRanges)
 
-## this one doesn't seem to work for arm64. maybe I don't need it anymore??
-##library(rtracklayer)
+## This is not available on ARM64 yet! So the copy number annotation code isn't working right now.
+library(rtracklayer)
 
 
 #' parse the summary.html breseq output file, and return the mean and dispersion
@@ -50,13 +52,8 @@ coverage.nbinom.from.html <- function(breseq.output.dir, sample.has.plasmid=TRUE
     table.data <- xml_find_all(table,'./tr/td')
     chromosome.avg <- as.numeric(xml_text(table.data[5]))
     chromosome.dispersion <- as.numeric(xml_text(table.data[6]))
-    print(paste('mean chromosome coverage is:', chromosome.avg))
-    print(paste('chromosome dispersion is:', chromosome.dispersion))
     transposon.avg <- as.numeric(xml_text(table.data[13]))
     transposon.dispersion <- as.numeric(xml_text(table.data[14]))
-    print(paste('mean transposon coverage is:', transposon.avg))
-    print(paste('transposon dispersion is:', transposon.dispersion))
-
     ## all samples should have these data.
     coverage.df <- data.frame('Sample' = basename(breseq.output.dir),
                               'mean'=c(chromosome.avg, transposon.avg),
@@ -64,13 +61,9 @@ coverage.nbinom.from.html <- function(breseq.output.dir, sample.has.plasmid=TRUE
                               'variance'=c(chromosome.avg * chromosome.dispersion,
                                            transposon.avg * transposon.dispersion),
                               'replicon'=c("chromosome", "transposon"))
-
     if (sample.has.plasmid) {
             plasmid.avg <- as.numeric(xml_text(table.data[21]))
             plasmid.dispersion <- as.numeric(xml_text(table.data[22]))
-            print(paste('mean plasmid coverage is:', plasmid.avg))
-            print(paste('plasmid dispersion is:', plasmid.dispersion))
-
             plasmid.coverage.df <- data.frame('Sample' = basename(breseq.output.dir),
                                               'mean' = plasmid.avg,
                                               'dispersion' = plasmid.dispersion,
@@ -79,7 +72,6 @@ coverage.nbinom.from.html <- function(breseq.output.dir, sample.has.plasmid=TRUE
             ## now join the plasmid coverage data.
             coverage.df <- rbind(coverage.df, plasmid.coverage.df)
     }
-    
     return(coverage.df)
 }
 
@@ -94,7 +86,6 @@ max.readlen.from.html <- function(breseq.output.dir) {
     table.data <- xml_find_all(table,'./tr/td')
     readlen.index <- length(table.data) - 1
     max.readlen <- xml_integer(xml_find_all(table.data[readlen.index],".//b//text()"))
-    print(paste('max read length is:',max.readlen))
     return(max.readlen)
 }
 
@@ -187,38 +178,41 @@ find.chromosomal.amplifications <- function(breseq.output.dir, gnome) { #gnome i
                              size=nbinom.fit$dispersion,
                              lower.tail=FALSE))^(len%/%max.read.len)) %>%
         mutate(is.significant=ifelse(pval<bonferroni.alpha,TRUE,FALSE)) %>%
-        filter(is.significant==TRUE) %>% mutate(Genome=as.character(gnome)) %>%
+        filter(is.significant==TRUE) %>% mutate(Sample=as.character(gnome)) %>%
         mutate(bonferroni.corrected.pval=pval*alpha/bonferroni.alpha)
     
     return(significant.amplifications)
 }
 
-## input: ancestor.gff: file.path of the ancestral genome
-##    amplifications: data.frame returned by find.amplifications.
-annotate.amplifications <- function(amplifications, ancestor.gff) {
+## THIS IS BROKEN, AT LEAST UNTIL BIOCONDUCTOR HAS A NATIVE MAC RELEASE.
+annotate.sample.amplifications <- function(sample.amplifications, ancestor.gff) {
+
+    ancestor.gff <- unique(sample.amplifications$gff_path)
+    
     ## create the IRanges object.
-    amp.ranges <- IRanges(amplifications$left.boundary,amplifications$right.boundary)
+    amp.ranges <- IRanges(sample.amplifications$left.boundary,
+                          sample.amplifications$right.boundary)
     ## Turn into a GRanges object in order to find overlaps with NEB5-alpha genes.
     g.amp.ranges <- GRanges("NZ_CP017100",ranges=amp.ranges)
-    ## and add the data.frame of amplifications as metadata.
-    mcols(g.amp.ranges) <- amplifications
+    ## and add the data.frame of sample.amplifications as metadata.
+    mcols(g.amp.ranges) <- sample.amplifications
     
     ## find the genes within the amplifications.
-    pLCA <- import.gff(LCA.gff)
-    LCA.Granges <- as(pLCA, "GRanges")
+    ancestor.gff.data <- import.gff(ancestor.gff)
+    ancestor.Granges <- as(ancestor.gff.data, "GRanges")
     
-    LCA.genes <- LCA.Granges[LCA.Granges$type == 'gene']
+    ancestor.genes <- ancestor.Granges[ancestor.Granges$type == 'gene']
     ## find overlaps between annotated genes and amplifications.
-    hits <- findOverlaps(LCA.genes,g.amp.ranges,ignore.strand=FALSE)
+    hits <- findOverlaps(ancestor.genes,g.amp.ranges,ignore.strand=FALSE)
     
-    ## take the hits, the LCA annotation, and the amplifications,
+    ## take the hits, the ancestor annotation, and the amplifications,
     ## and produce a table of genes found in each amplication.
     
     hits.df <- data.frame(query.index=queryHits(hits),subject.index=subjectHits(hits))
     
-    query.df <- data.frame(query.index=seq_len(length(LCA.genes)),
-                           gene=LCA.genes$Name,locus_tag=LCA.genes$ID,
-                           start=start(ranges(LCA.genes)),end=end(ranges(LCA.genes)))
+    query.df <- data.frame(query.index=seq_len(length(ancestor.genes)),
+                           gene=ancestor.genes$Name,locus_tag=ancestor.genes$ID,
+                           start=start(ranges(ancestor.genes)),end=end(ranges(ancestor.genes)))
     
     subject.df <- bind_cols(data.frame(subject.index=seq_len(length(g.amp.ranges))),data.frame(mcols(g.amp.ranges)))
     
@@ -228,6 +222,13 @@ annotate.amplifications <- function(amplifications, ancestor.gff) {
     
     return(amplified.genes.df)
 }
+
+
+annotate.amplifications <- function(amps.with.ancestors) {
+    amps.with.ancestors %>% split(.$Sample) %>%
+        map_dfr(.f = annotate.sample.amplifications)    
+}
+
 
 plot.amp.segments <- function(annotated.amps,clone.labels) {
     
@@ -294,19 +295,26 @@ metagenome.metadata <- read.csv("../data/draft-manuscript-1A/evolved-populations
 
 mixedpop.output.dir <- file.path(projdir, "results", "draft-manuscript-1A", "genome-analysis", "mixed-pops")
 all.mixedpops <- list.files(mixedpop.output.dir,pattern='^RM')
-all.mixedpop.paths <- sapply(all.genomes, function(x) file.path(mixedpop.output.dir,x))
+all.mixedpop.paths <- sapply(all.mixedpops, function(x) file.path(mixedpop.output.dir,x))
 mixedpop.input.df <- data.frame(Sample=all.mixedpops, path=all.mixedpop.paths) %>%
     ## skip the two clone samples for now.
     inner_join(metagenome.metadata)
 
+### TODO: finish the analysis of copy number variation in these samples.
+ancestral.clones.df <- read.csv("../data/draft-manuscript-1A/ancestral-clones.csv") %>%
+    dplyr::rename(Ancestor = Sample) %>%
+    select(-SampleType) %>%
+    mutate(gff_name = paste0(Ancestor, ".gff3")) %>%
+    mutate(gff_path = file.path(projdir, "results", "draft-manuscript-1A", "genome-analysis", gff_name))
 
-## Find chromosomal amplifications in all samples.
-amps <- map2_df(mixedpop.input.df$path,
+## Find chromosomal amplifications in all samples, and annotate with their ancestor gff file.
+amps.with.ancestors <- map2_df(mixedpop.input.df$path,
                 mixedpop.input.df$Sample,
                 find.chromosomal.amplifications) %>%
-    ungroup()
-
-### TODO: finish the analysis of copy number variation in these samples.
+    ungroup() %>%
+    left_join(metagenome.metadata) %>%
+    select(-SampleType) %>%
+    left_join(ancestral.clones.df)
 
 
 ## Plot the plasmid/chromosome and transposon/chromosome ratio in each sample.
