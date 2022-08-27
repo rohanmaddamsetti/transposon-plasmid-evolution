@@ -19,7 +19,8 @@ import sys
 sys.path.append("genomediff-python")
 import genomediff
 
-def write_evolved_pop_mutations(evol_pop_labels, mixed_pop_paths, outf):    
+
+def write_evolved_pop_mutations(evol_pop_labels, mixed_pop_paths, outf, FALSE_POSITIVE_BLACKLIST):
     outfh = open(outf,"w")
     outfh.write("Sample,Transposon,Plasmid,Tet,Population,Mutation,Mutation_Category,Gene,Position,Allele,Frequency\n")
     
@@ -44,8 +45,12 @@ def write_evolved_pop_mutations(evol_pop_labels, mixed_pop_paths, outf):
                     pos = str(rec.attributes['position'])
                     mut_category = rec.attributes['mutation_category']
                     gene = rec.attributes['gene_name']
+                    ## skip over false positive blacklisted genes.
+                    if gene in FALSE_POSITIVE_BLACKLIST: continue
                     ## handle transpositions of the synthetic Tn5 transposon.
-                    if "repeat_name" in rec.attributes and rec.attributes["repeat_name"] == " Synthetic Tn5": ## the leading space is important.
+                    ## IMPORTANT: the next line will fail if gdtools produces a repeat name with a leading space,
+                    ## " Synthetic Tn5". I should manually fix these reference gd files if this is the case.
+                    if "repeat_name" in rec.attributes and rec.attributes["repeat_name"] == "Synthetic Tn5":
                         gene = "tetA-Tn5-" + gene
                     freq = str(rec.attributes['frequency'])
                     if 'new_seq' in rec.attributes:
@@ -66,7 +71,7 @@ def main():
     projdir = dirname(srcdir)
     assert projdir.endswith("transposon-plasmid-evolution")
 
-    genome_results_dir = join(projdir,"results","draft-manuscript-1A","genome-analysis")
+    genome_results_dir = join(projdir,"results","genome-analysis")
     breseq_pops_results_dir = join(genome_results_dir,"mixed-pops")
 
     pop_clone_label_f = join(projdir,"data","draft-manuscript-1A","evolved-populations-and-clones.csv")
@@ -79,7 +84,8 @@ def main():
     ''' tabulate the mutations in the evolved populations.'''
     evolved_pop_labels = all_pop_clone_labels[all_pop_clone_labels['Sample'].isin(mixed_pops)]
     mut_table_outf = join(genome_results_dir,"evolved_mutations.csv")
-    write_evolved_pop_mutations(evolved_pop_labels, mixed_pop_paths, mut_table_outf)
+    FALSE_POSITIVE_BLACKLIST = ["NEB5A_RS23175", "insG/nanX"]
+    write_evolved_pop_mutations(evolved_pop_labels, mixed_pop_paths, mut_table_outf, FALSE_POSITIVE_BLACKLIST)
 
     
 main()
