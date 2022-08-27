@@ -10,18 +10,11 @@ library(ggthemes)
 library(viridis)
 library(ggrepel)
 
-
-## Determination of DH5a oriC:
-
 ## DH5a origin, based on aligning Jeff Barrick's manual annotation of the
 ## REL606 oriC sequence against NZ_CP017100 using NCBI BLAST.
 NZ_CP017100_oriC_START = 3866291
 NZ_CP017100_oriC_END = 3866522
 NZ_CP017100_oriC_MID = (NZ_CP017100_oriC_START+NZ_CP017100_oriC_END)/2
-
-## oriC sequences are associated with GC skew.
-## See the classic article "Analyzing genomes with cumulative skew diagrams"
-## by Andrei Grigoriev in Nucleic Acids Research.
 
 ## GC skew calculations using the webserver at:
 ## https://genskew.csb.univie.ac.at/webskew
@@ -134,7 +127,7 @@ make.allele.freq.histogram <- function(evolved.mutations.df, my.title,annotate=F
 
 
 Tet0.evolved.mutations <- filter(evolved.mutations, Tet==0)
-Tet50.evolved.mutations <- filter()evolved.mutations, Tet==50)
+Tet50.evolved.mutations <- filter(evolved.mutations, Tet==50)
 Fig2A <- make.allele.freq.histogram(Tet0.evolved.mutations, "Tet 0 populations",TRUE)
 Fig2B <- make.allele.freq.histogram(Tet50.evolved.mutations, "Tet 50 populations",TRUE)
 
@@ -240,19 +233,9 @@ ggsave(full.fig2CD, file=fig2CD.output,width=8,height=5)
 
 ## let's take a close look at the different kinds of evolved mutations.
 
-## TODO: Make a figure to show the granular changes, bp-level parallelism here!
-
-## the frmR/yaiO mutation is a +G mutation, causing a (G)9 repeat to become a (G)10 repeat.
-## This is a likely candidate for a hypermutable contingency locus.
-evolved.INDEL <- evolved.mutations %>% filter(Mutation == "INS" | Mutation == "DEL")
-
-## ALL of these MOB insertiona are miniTn5-Tet insertions, either into the KanR gene
+## ALL of these MOB insertions are miniTn5-Tet insertions, either into the KanR gene
 ## on the plasmid, or into chromosomal genes in the no plasmid treatment.
 evolved.MOB <- evolved.mutations %>% filter(Mutation == "MOB") 
-
-evolved.intergenic <- evolved.mutations %>% filter(Mutation == "intergenic") %>%
-    arrange(Gene, Position, Plasmid, Sample) %>%
-    select(-Transposon, -Mutation, -Mutation_Category, -Population)
 
 ## extremely strong parallel evolution in tetA-- seen only in no plasmid treatment.
 ## the parallel evolution is at the nucleotide level in the no plasmid treatment:
@@ -260,7 +243,12 @@ evolved.intergenic <- evolved.mutations %>% filter(Mutation == "intergenic") %>%
 ## has a nonsynonymous mutation,), and (4285, 4285, 4286 are independent nonsense mutations
 ## that truncate the very end of the protein.)
 evolved.tetA <- evolved.mutations %>% filter(str_detect(Gene, "tetA")) %>%
+    filter(Mutation != "MOB") %>%
     arrange(Sample, Position)
+
+## parallel evolution of robA in no plasmid treatment.
+evolved.nonsynonymous <- evolved.mutations %>% filter(Mutation == "nonsynonymous") %>%
+    arrange(Gene, Position, Sample)
 
 ## most synonymous mutations in pops 3,4,5  of the pUC plasmid treatment.
 ## This will certainly be a significant association. perhaps some cryptic hypermutator
@@ -268,32 +256,22 @@ evolved.tetA <- evolved.mutations %>% filter(str_detect(Gene, "tetA")) %>%
 evolved.synonymous <- evolved.mutations %>% filter(Mutation == "synonymous") %>%
     arrange(Gene, Position, Sample)
 
-## parallel evolution of robA in no plasmid treatment.
-evolved.nonsynonymous <- evolved.mutations %>% filter(Mutation == "nonsynonymous") %>%
-    arrange(Gene, Position, Sample)
 
-## TODO: do a dN/dS ratio analysis , like in Tenaillon et al. (2016), to compare pUC treatments (tet0, tet50), to the rest.
+evolved.INDEL <- evolved.mutations %>% filter(Mutation == "INS" | Mutation == "DEL")
+
+evolved.intergenic <- evolved.mutations %>% filter(Mutation == "intergenic") %>%
+    arrange(Gene, Position, Plasmid, Sample) %>%
+    select(-Transposon, -Mutation, -Mutation_Category, -Population)
+
+
 
 #####################################################################################
 ## examine DNA repair and DNA polymerase/replication genes for mutator and anti-mutator
 ## candidates.
 
 DNA.repair.loci <- read.csv("../data/draft-manuscript-1A/DNA-repair-and-replication.csv",header=TRUE,as.is=TRUE)
-
+## some mutations in DNA repair genes, but hard to conclude anything from this.
 DNA.repair.muts <- filter(evolved.mutations, Gene %in% unique(DNA.repair.loci$Gene))
-
-## no parallelism at nucleotide level.
-DNA.repair.parallel.nuc <- DNA.repair.muts %>%
-    group_by(Gene, Position) %>% summarize(count=n()) %>%
-    arrange(desc(count)) %>% filter(count>1)
-
-## little evidence of parallel evolution: 3 pops have mutL mutations, 2 of them in Tet 0 treatment.
-DNA.repair.parallel.gene <- DNA.repair.muts %>%
-    group_by(Gene) %>% summarize(count=n()) %>%
-    arrange(desc(count)) %>% filter(count>1)
-
-DNA.repair.parallel.loci.muts <- DNA.repair.muts %>%
-    filter(Gene %in% DNA.repair.parallel.gene$Gene)
 
 #################################################################################
 ## analysis of parallel evolution at the same nucleotide.
@@ -327,6 +305,8 @@ parallel.genes <- gene.level.parallel.mutations %>%
     select(Gene, count, Plasmid, Transposon, Tet) %>%
     distinct() %>%
     arrange(desc(count))
+
+
 
 ################################################################################
 ### Figure 3: make a matrix plot of genes with mutations in two or more clones.
@@ -615,13 +595,8 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
 
 }
 
-## let's make separate figures for:
-## A) genes that show parallelism across all treatments
-## B) genes  specific to Tet 0 treatment
-## C) genes specific to Tet 50 treatment
-## D) all other mutations
 
-## A) genes that show parallelism across Tet 0 and Tet 50.
+## examine genes that show parallelism across Tet 0 and Tet 50.
 parallel.genes.across.Tet0.and.Tet50 <- parallel.genes %>%
     select(Gene, Tet) %>%
     distinct() %>%
@@ -632,9 +607,25 @@ parallel.genes.across.Tet0.and.Tet50 <- parallel.genes %>%
 parallel.mutations.across.Tet0.and.Tet50 <- evolved.mutations %>%
     filter(Gene %in% parallel.genes.across.Tet0.and.Tet50$Gene)
 
-Fig6A <- MakeMutCountMatrixFigure(parallel.mutations.across.Tet0.and.Tet50, "both", show.all=TRUE, use.treatment.hit.sort=FALSE)
-Fig6A.outf <- "../results/draft-manuscript-1A/Fig6A.pdf"
-ggsave(Fig6A.outf, Fig6A, height=5, width=12)
+## the intergenic mutations on the plasmid occur in the oriC sequences.
+## IMPORTANT TODO: analyze these in a separate figure, to relate to the
+## evolved changes in plasmid copy number.
+plasmid.origin.muts <- parallel.mutations.across.Tet0.and.Tet50 %>%
+    filter(Gene == "–/KanR")
+
+## remove these from the other parallel mutations across the 2 treatments.
+## the remaining mutations are not that interesting.
+## 3 loci: mrcA, narU, rpsA, yeeJ, 2 parallel mutations in each
+filtered.parallel.mutations.across.Tet0.and.Tet50 <- parallel.mutations.across.Tet0.and.Tet50 %>%
+    filter(Gene != "–/KanR")
+
+
+
+## let's make separate figures for:
+## B) genes parallel in Tet 0 treatment
+## C) genes specific to Tet 50 treatment
+## D) all other mutations
+
 
 ## B) genes that only show parallelism in Tet 0.
 parallel.genes.in.Tet0 <- parallel.genes %>%
@@ -662,7 +653,8 @@ parallel.mutations.in.only.Tet50 <- evolved.mutations %>%
     filter(Gene %in% parallel.genes.in.Tet50$Gene)
 
 Fig6C.data <- full_join(evolved.MOB,
-                        filter(parallel.mutations.in.only.Tet50, Allele != "MOB"))
+                        filter(parallel.mutations.in.only.Tet50, Allele != "MOB")) %>%
+                    filter(Frequency > 0.10))
 
 Fig6C <- MakeMutCountMatrixFigure(Fig6C.data,
                                   "Tet50", show.all=TRUE, use.treatment.hit.sort=FALSE)
@@ -676,27 +668,17 @@ Fig6D.data <- evolved.mutations %>%
     filter(!(Gene %in% parallel.genes.in.Tet0$Gene)) %>%
     filter(!(Gene %in% parallel.genes.in.Tet50$Gene))
 
-Fig6D <- MakeMutCountMatrixFigure(Fig6D.data,
-                                  "both", show.all=TRUE, use.treatment.hit.sort=FALSE)
-Fig6D.outf <- "../results/draft-manuscript-1A/Fig6D.pdf"
-ggsave(Fig6D.outf, Fig6D, height=8, width=12)
-
-
-## show just MOB mutations across all treatments and populations.
-## maybe this result can go into the ARG duplication manuscript.
-
-MOBFig <- MakeMutCountMatrixFigure(evolved.MOB,
-                                  "Tet50", show.all=TRUE, use.treatment.hit.sort=FALSE)
-MOBFig.outf <- "../results/draft-manuscript-1A/MOBFig.pdf"
-ggsave(MOBFig.outf, MOBFig, height=6, width=12)
 
 
 
-Fig6 <- MakeMutCountMatrixFigure(evolved.mutations, "both", show.all=TRUE, use.treatment.hit.sort=FALSE)
+
+Fig6 <- MakeMutCountMatrixFigure(filter(evolved.mutations,Frequency>0.10),
+                                 "both", show.all=TRUE, use.treatment.hit.sort=FALSE)
 matrix.outf <- "../results/draft-manuscript-1A/Fig6.pdf"
 ggsave(matrix.outf, Fig6, height=8, width=12)
 
-Fig6singles <- MakeMutCountMatrixFigure(evolved.mutations, "both", show.all=T)
+Fig6singles <- MakeMutCountMatrixFigure(filter(evolved.mutations,Frequency>0.10),
+                                        "both", show.all=T)
 ggsave("../results/draft-manuscript-1A/Fig6-singles.pdf", Fig6singles, height=20, width=12)
 
 
@@ -707,45 +689,3 @@ ggsave(Fig7.matrix.outf, Fig7, height=8, width=12)
 Fig7singles <- MakeSummedAlleleFrequencyMatrixFigure(evolved.mutations, show.all=T)
 ggsave("../results/draft-manuscript-1A/Fig7-singles.pdf", Fig7singles, height=20, width=12)
 
-###########################################################
-
-## Evolutionary rate comparisons across treatments,
-## following Deatherage et al. (2017)
-## and Blount, Maddamsetti, Grant et al. (2020).
-
-## This section will be expanded, as more genome data comes in.
-
-## Sum the allele frequencies and number of mutations across genes in each sample.
-total.allele.frequency.summary <- evolved.mutations %>%
-    group_by(Sample, Transposon, Plasmid, Population) %>%
-    summarize(mutation.count = n(), summed.Allele.Frequency = sum(Frequency)) %>%
-    left_join(pop.clone.labels) %>%
-    unite("Treatment", Transposon:Plasmid, remove = FALSE) %>%
-    select(Sample, mutation.count, summed.Allele.Frequency,
-           Transposon, Plasmid, Treatment) %>%
-    ungroup()
-
-pUC.treatment.total.allele.frequencies <- total.allele.frequency.summary %>%
-    filter(Plasmid == "pUC")
-
-noPlasmid.treatment.total.allele.frequencies <- total.allele.frequency.summary %>%
-    filter(Plasmid == "None")
-
-## two-tailed Mann-Whitney U-test: no difference in numbers of mutations
-## or summed allele frequencies between treatments. BUT note that
-## RM6-176-16 and RM6-176-17 samples have more mutations, probably
-## due to some cryptic hypermutator phenotype.
-wilcox.test(pUC.treatment.total.allele.frequencies$mutation.count,
-            noPlasmid.treatment.total.allele.frequencies$mutation.count)
-
-wilcox.test(pUC.treatment.total.allele.frequencies$summed.Allele.Frequency,
-            noPlasmid.treatment.total.allele.frequencies$summed.Allele.Frequency)
-
-## we can also use the Kruskal-Wallis test to show no difference between treatments
-## in number of mutations or total allele frequency.
-## NOTE: the df is different between these two calls-- might this be a bug?
-kruskal.test(pUC.treatment.total.allele.frequencies$mutation.count,
-             noPlasmid.treatment.total.allele.frequencies$mutation.count)
-
-kruskal.test(pUC.treatment.total.allele.frequencies$summed.Allele.Frequency,
-             noPlasmid.treatment.total.allele.frequencies$summed.Allele.Frequency)
