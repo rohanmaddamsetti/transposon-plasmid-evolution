@@ -1,5 +1,4 @@
 """ 
-
 specificity-analysis.jl by Rohan Maddamsetti.
 
 I use Fisher's exact test to test genes for the clustering of occurrences of mutations
@@ -9,14 +8,13 @@ I also use a randomization test to test for similarity of metagenomic evolution 
 treatments (similar to analyses that use Dice coefficient as a similarity metric),
 
 and use a randomization test to compare the similarity of metagenomic evolution
-to external genomic datasets from evolution experiments with Tetracycline selection.
+to external genomic datasets from evolution experiments with tetracycline selection.
 
 This analysis builds upon the analysis framework in:
 Deatherage et al. (2017) "Specificity of genome evolution in experimental populations of
 Escherichia coli evolved at different temperatures"
 
 TODO: correct p-values for multiple testing as needed in the future.
-
 """
 
 using DataFrames, DataFramesMeta, CSV, StatsBase, HypothesisTests, MultipleTesting, Random, FLoops
@@ -31,12 +29,12 @@ function GeneSpecificityFisherTest(specificity_summary, gene, treatment1, treatm
     Number of metagenomes w/o mutations in gene x  |  C |  D
 
 Possible values for the treatment_strs:
-B20_None
-B20_p15A
-B20_pUC
-B30_None
-B30_p15A
-B30_pUC
+B20_None_50
+B20_p15A_50
+B20_pUC_50
+B30_None_50
+B30_p15A_50
+B30_pUC_50
     """
     
     POPS_PER_TREATMENT = 5
@@ -70,7 +68,7 @@ function RunGeneSpecificityAnalysis(evolved_mutations)
     ## for documentation of this syntax, see:
     ## https://juliadata.github.io/DataFramesMeta.jl/stable/#Comparison-with-dplyr-and-LINQ
     gene_specificity_summary = @chain evolved_mutations begin
-        @rtransform(:Treatment = :Transposon * "_" * :Plasmid)
+        @rtransform(:Treatment = :Transposon * "_" * :Plasmid * "_" * string(:Tet))
         groupby([:Gene, :Treatment])
         @combine(:MutationCount = length(:Mutation),
                  :SummedAlleleFrequency = sum(:Frequency),
@@ -79,9 +77,9 @@ function RunGeneSpecificityAnalysis(evolved_mutations)
     end
 
     ## let's examine the following pairs of treatments.
-    treatments_to_compare = [("B30_None", "B30_pUC"), ("B20_None", "B20_pUC"),
-                             ("B20_None", "B20_p15A"), ("B20_pUC", "B20_p15A"),
-                             ("B20_None", "B30_None"), ("B20_pUC", "B30_pUC")]
+    treatments_to_compare = [("B30_None_50", "B30_pUC_50"), ("B20_None_50", "B20_pUC_50"),
+                             ("B20_None_50", "B20_p15A_50"), ("B20_pUC_50", "B20_p15A_50"),
+                             ("B20_None_50", "B30_None_50"), ("B20_p15A_50", "B30_p15A_50"), ("B20_pUC_50", "B30_pUC_50")]
         
     ## iterate over the pairs of treatments to compare.
     for treatment_tuple in treatments_to_compare
@@ -96,7 +94,6 @@ function RunGeneSpecificityAnalysis(evolved_mutations)
             GeneSpecificityFisherTest(gene_specificity_summary, gene, treatment1, treatment2)
         end
     end
-
 end
 
 
@@ -232,22 +229,56 @@ function filter_Card2021_mutations(card2021_mutations, evolved_mutations)
 end
 
 
+## IMPORTANT TODO: I may need to apply a similar reweighting of allele frequency for B20 pUC, and the p15A
+## transposition events, since there are multiple transpositions that sometimes combine to have an allele frequency > 100%.
+## This is technically possible if some plasmids have double insertions, but if each plasmid has a single insertion,
+## then the allele frequencies for each transposition need to be renormalized to sum to 100%.
+function reweight_tetA_Tn5_KanR_plasmid_frequencies(df)
+    ## For the purpose of this analysis, the allele frequencies of the tetA-Tn5-KanR in the B30 treatment
+    ## need to be set to 1.0, to treat  the tetA-plasmid balanced polymorphism as a fixed genotype.
+    ## This is a hack... 
+    ## See: https://stackoverflow.com/questions/66586623/julia-dataframe-preferred-way-to-update-values-in-one-column-based-on-the-valu/66587724#66587724
+    updated_df = df
+    updated_df.Frequency = @. ifelse(df.Treatment == "B30_pUC_50" && df.Gene == "tetA-Tn5-KanR", 1.0, df.Frequency)
+    return updated_df
+end
+
+
+function read_evolved_mutations()
+    ## I wrapped up this code into a function so that refactoring doesn't accidentally break this logic.
+    evolved_mutations = CSV.read(
+        "../results/genome-analysis/evolved_mutations.csv", DataFrame)
+    ## Add a Treatment Column.
+    @rtransform!(evolved_mutations, :Treatment = :Transposon * "_" * :Plasmid * "_" * string(:Tet))
+    evolved_mutations = reweight_tetA_Tn5_KanR_plasmid_frequencies(evolved_mutations)    
+    return evolved_mutations
+end
+
+
 ################################################################################
 ## import the data. All mutation filtering criteria is done when breseq is used to call variants,
 ## so no additional filters are applied at this stage of the data analysis.
+evolved_mutations = read_evolved_mutations() ## wrapping up some ugly code that needs to be run together.
 
-evolved_mutations = CSV.read(
-    "../results/draft-manuscript-1A/genome-analysis/evolved_mutations.csv", DataFrame)
-## Add a Treatment Column.
-@rtransform!(evolved_mutations, :Treatment = :Transposon * "_" * :Plasmid)
+B20_noPlasmid_50_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_None_50")
+B20_p15A_50_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_p15A_50")
+B20_pUC_50_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_pUC_50")
 
-B20_noPlasmid_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_None")
-B20_p15A_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_p15A")
-B20_pUC_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B20_pUC")
+B30_noPlasmid_50_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_None_50")
+B30_p15A_50_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_p15A_50")
+B30_pUC_50_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_pUC_50")
 
-B30_noPlasmid_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_None")
-B30_p15A_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_p15A")
-B30_pUC_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_pUC")
+## Consider the analysis when we restrict to genes showing parallel evolution.
+parallel_genes = @chain evolved_mutations begin
+    @rtransform(:Treatment = :Transposon * "_" * :Plasmid)
+    groupby(:Gene)
+    @combine(:MutationCount = length(:Mutation))
+    @rsubset(:MutationCount > 1)
+    innerjoin(evolved_mutations, on = :Gene)
+end
+
+parallel_evolved_mutations = @rsubset(evolved_mutations, :Gene in parallel_genes.Gene)
+
 ###############################################################################
 ## Gene-specific specificity analyses. Use Fisher's exact test, and extensions
 ## to metagenomic data.
@@ -258,104 +289,83 @@ B30_pUC_treatment_mutations = @rsubset(evolved_mutations, :Treatment == "B30_pUC
 
 # the treatments are currently hardcoded in this function.
 RunGeneSpecificityAnalysis(evolved_mutations)
-
-## the following genes show evidence of specificity between B30_None and B30_pUC.
-## lysO/aqpZ
-## yohP/dusC
+## the following genes show evidence of specificity between B30_None_50 and B30_pUC_50.
 ## tetA
 ## tetA-Tn5-KanR (tet-transposon insertions on the plasmid)
-## frmR/yaiO
-## yeaD/yeaE
-## YY-K12originalarray/KanR
+## –/KanR (repeat expansion on the plasmid, probably not adaptive because happens in Tet 0 treatment).
 
-## the following genes show evidence of specificity between B20_None and B20_pUC.
-## gatY/fbaB
-## lysO/aqpZ
-## yiiG/frvR
-## yohP/dusC
-## YY-K12originalarray/KanR
-## YY-K12originalarray
+## the following genes show evidence of specificity between B20_None_50 and B20_pUC_50
+## tetA-Tn5-KanR (tet-transposon insertions on the plasmid)
+## tetA-Tn5-NEB5A_RS07165 (tet-transposon insertions on the chromosome with B20)
 
-## the following genes show evidence of specificity between B20_p15A and B20_pUC.
-## gatY/fbaB
-## YY-K12originalarray/KanR
-## lysO/aqpZ
-## YY-K12originalarray
-## yiiG/frvR
-## yohP/dusC
-## ves/spy
+## the following genes show evidence of specificity between B20_None_50 and B20_p15A_50:
+## –/KanR (repeat expansion on the plasmid, probably not adaptive because happens in Tet 0 treatment).
+## tetA-Tn5-KanR (tet-transposon insertions on the plasmid)
+## tetA-Tn5-NEB5A_RS07165 (tet-transposon insertions on the chromosome)
 
-## CRITICAL TODO!!!! subtract mutations from B20 ancestors, and re-run to see what's real.
-## the following genes show evidence of specificity between B20_None and B30_None.
-## fill in this section later.
+## NO  genes show evidence of specificity between B20_p15A_50 and B20_pUC_50
 
-## the following genes show evidence of specificity between B20_pUC and B30_pUC.
-## fill in this section later.
+## the following genes show evidence of specificity between B20_None_50 and B30_None_50.
+## tetA-Tn5-NEB5A_RS07165 (tet-transposon insertions on the chromosome with B20, not B30).
 
+## No genes show evidence of specificity between B20_pUC and B30_pUC.
 
 ################################################################################
-## I use the weighted Jaccard index to calculate the specificity of evolutionary
-## paths within experimental treatments.
-## See: https://en.wikipedia.org/wiki/Jaccard_index#Weighted_Jaccard_similarity_and_distance
-## https://en.wikipedia.org/wiki/Fuzzy_set
-## https://en.wikipedia.org/wiki/T-norm
+## IMPORTANT TODO: generalize this to multiple treatments, contrasting one treatment against all others.
+function WeightedJaccardIndexSpecificityAnalysis(mutations, treatment_str1, treatment_str2, nBootstraps=100_000)
+    ## I use the weighted Jaccard index to calculate the specificity of evolutionary
+    ## paths within experimental treatments.
+    ## See: https://en.wikipedia.org/wiki/Jaccard_index#Weighted_Jaccard_similarity_and_distance
+    ## https://en.wikipedia.org/wiki/Fuzzy_set
+    ## https://en.wikipedia.org/wiki/T-norm
 
-## First, make matrices for the metagenomes in each treatment. Each row is a different
-## gene or intergenic region that is mutated in at least one mixed pop. sample.
+    println("Treatment 1: " * treatment_str1)
+    println("Treatment 2: " * treatment_str2)
+    ## First, make matrices for the metagenomes in each treatment. Each row is a different
+    ## gene or intergenic region that is mutated in at least one mixed pop. sample.
+    treatment1_matrix = GeneSampleTotalAlleleFreqMatrix(mutations, treatment_str1)
+    treatment2_matrix = GeneSampleTotalAlleleFreqMatrix(mutations, treatment_str2)
+    
+    ## Calculate the mean similarity within each treatment and print.
+    treatment1_Mean = MeanWeightedJaccardSimilarityForTreatment(treatment1_matrix)
+    println("Treatment 1 Mean: ", treatment1_Mean)
+    treatment2_Mean = MeanWeightedJaccardSimilarityForTreatment(treatment2_matrix)
+    println("Treatment 2 Mean: ", treatment2_Mean)
+    
+    ## I follow the logic of the calculation in Deatherage et al. (2017) in PNAS.
+    glued_matrix = hcat(treatment1_matrix, treatment2_matrix)
 
-B30_noPlasmid_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B30_None")
-B30_pUC_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B30_pUC")
+    Grand_Mean = MeanWeightedJaccardSimilarityForTreatment(glued_matrix)
+    println("Grand Mean: ", Grand_Mean)
+    withinTreatment_Mean = mean([treatment1_Mean, treatment2_Mean])
+    println("Within Treatment Mean: ", withinTreatment_Mean)
+    betweenTreatment_Mean = MeanWeightedJaccardSimilarityBetweenTreatments(treatment1_matrix, treatment2_matrix)
+    println("Between Treatment Mean: ", betweenTreatment_Mean)
+    ## now, do the randomization test for statistical significance.
+    println("Time to run and p-value:")
+    @time WeightedJaccardRandomizationTest(treatment1_matrix, treatment2_matrix, nBootstraps)
+end
 
-## more parallelism in the no Plasmid treatment than in the pUC treatment
-B30_noPlasmid_Mean = MeanWeightedJaccardSimilarityForTreatment(B30_noPlasmid_matrix)
-B30_pUC_Mean = MeanWeightedJaccardSimilarityForTreatment(B30_pUC_matrix)
+## This is just for checking out the frequency reweighting to 1.0 I applied to pUC tetA-Tn5-KanR mutations.
+@rsubset(evolved_mutations, :Treatment == "B30_pUC_50").Gene
+@rsubset(evolved_mutations, :Treatment == "B30_pUC_50").Frequency
 
-## I follow the logic of the calculation in Deatherage et al. (2017) in PNAS.
-B30_glued_matrix = hcat(B30_noPlasmid_matrix, B30_pUC_matrix)
+## Within treatment populations are much more similar than between treatment populations
+## (perhaps trivial), but no compelling evidence that plasmid copy number INCREASES parallel evolution.
+## There's strongly parallel evolution (evolutionary convergence) in the no plasmid treatments!
 
-B30_Grand_Mean = MeanWeightedJaccardSimilarityForTreatment(B30_glued_matrix)
-B30_withinTreatment_Mean = mean([B30_noPlasmid_Mean, B30_pUC_Mean])
-B30_betweenTreatment_Mean = MeanWeightedJaccardSimilarityBetweenTreatments(B30_pUC_matrix, B30_noPlasmid_matrix)
-                                                                       
-## now, do the randomization test for statistical significance.
-@time WeightedJaccardRandomizationTest(B30_pUC_matrix, B30_noPlasmid_matrix, 100_000)
-## p = 0.00001 with 100,000 bootstraps.
+## Comparing B30 None to B30 pUC.
+WeightedJaccardIndexSpecificityAnalysis(evolved_mutations, "B30_None_50", "B30_pUC_50")
+## Comparing B30 None to B30 p15A.
+WeightedJaccardIndexSpecificityAnalysis(evolved_mutations, "B30_None_50", "B30_p15A_50")
+## Comparing B30 p15A to B30 pUC.
+WeightedJaccardIndexSpecificityAnalysis(evolved_mutations, "B30_p15A_50", "B30_pUC_50")
 
-## re-run the comparison with B20.
+## re-run comparisons, with B20.
+## more specificity with greater plasmid copy number with B20.
+WeightedJaccardIndexSpecificityAnalysis(evolved_mutations, "B20_None_50", "B20_p15A_50")
+WeightedJaccardIndexSpecificityAnalysis(evolved_mutations, "B20_p15A_50", "B20_pUC_50")
 
-B20_noPlasmid_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B20_None")
-B20_pUC_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B20_pUC")
-B20_p15A_matrix = GeneSampleTotalAlleleFreqMatrix(evolved_mutations, "B20_p15A")
-
-##  parallelism in the no Plasmid treatment than in the pUC treatment
-B20_noPlasmid_Mean = MeanWeightedJaccardSimilarityForTreatment(B20_noPlasmid_matrix)
-B20_pUC_Mean = MeanWeightedJaccardSimilarityForTreatment(B20_pUC_matrix)
-B20_p15A_Mean = MeanWeightedJaccardSimilarityForTreatment(B20_p15A_matrix)
-
-## I follow the logic of the calculation in Deatherage et al. (2017) in PNAS.
-B20_glued_matrix = hcat(B20_noPlasmid_matrix, B20_pUC_matrix, B20_p15A_matrix)
-
-B20_Grand_Mean = MeanWeightedJaccardSimilarityForTreatment(B20_glued_matrix)
-## CRITICAL TODO: FIGURE OUT WHETHER THIS IS CORRECT...
-B20_withinTreatment_Mean = mean([B20_noPlasmid_Mean, B20_pUC_Mean, B20_p15A_Mean])
-
-## CRITICAL TODO: figure how what to do with the p15A treatment now.
-
-B20_betweenTreatment_Mean1 = MeanWeightedJaccardSimilarityBetweenTreatments(B20_pUC_matrix, B20_noPlasmid_matrix)
-
-B20_betweenTreatment_Mean2 = MeanWeightedJaccardSimilarityBetweenTreatments(B20_pUC_matrix, B20_p15A_matrix)
-
-B20_betweenTreatment_Mean3 = MeanWeightedJaccardSimilarityBetweenTreatments(B20_noPlasmid_matrix, B20_p15A_matrix)
-
-## now, do the randomization test for statistical significance.
-@time WeightedJaccardRandomizationTest(B20_pUC_matrix, B20_noPlasmid_matrix, 100_000)
-## p = 0.00327 with 100,000 bootstraps.
-
-@time WeightedJaccardRandomizationTest(B20_pUC_matrix, B20_p15A_matrix, 100_000)
-## p = 0.00284 with 100,000 bootstraps.
-
-@time WeightedJaccardRandomizationTest(B20_noPlasmid_matrix, B20_p15A_matrix, 100_000)
-## p = 0.00254 with 100,000 bootstraps.
 
 ################################################################################
 ## comparison of evolutionary paths to other published evolution experiments.
@@ -384,34 +394,15 @@ bottery_mutations = CSV.read("../data/draft-manuscript-1A/Bottery2017-Figure_2_S
 relevant_bottery_muts = @rsubset(bottery_mutations, :Gene in evolved_mutations.Gene)
 
 pUC_treatment_mutations = @rsubset(evolved_mutations, :Plasmid == "pUC")
+p15A_treatment_mutations = @rsubset(evolved_mutations, :Plasmid == "p15A")
 noPlasmid_treatment_mutations = @rsubset(evolved_mutations, :Plasmid == "None")
 
 pUC_and_bottery_muts = @rsubset(bottery_mutations, :Gene in pUC_treatment_mutations.Gene)
+p15A_and_bottery_muts = @rsubset(bottery_mutations, :Gene in p15A_treatment_mutations.Gene)
 noPlasmid_and_bottery_muts = @rsubset(bottery_mutations, :Gene in noPlasmid_treatment_mutations.Gene)
 
 ## there is much more gene-level parallelism between the no Plasmid treatment
 ## and the Bottery experiment than between the pUC treatment and the Bottery experiment.
-
-
-bottery_frmR_yaiO_muts = @rsubset(bottery_mutations, :Gene == "frmR/yaiO")
-my_frmR_yaiO_muts = @rsubset(evolved_mutations, :Gene == "frmR/yaiO")
-## by examining the GenBank: U00096.3 K-12 MG1655 reference used by Bottery et al. (2017),
-## the 380012 +G frmR/yaiO K-12 MG1655 mutation 
-## 286010, -131/+56 frmR/yaiO in DH5-alpha are homologous!
-## They affect the same G(9) or G(10) repeat.
-## NOTA BENE: this mutation was seen in 1/6 Tet lines, and 1/6 no plasmid no antibiotic
-## lines in the Bottery dataset. Another mutation at 379915, or at the -34 position
-## relative to frmR was observed in 1/6 of the +plasmid -antibiotic treatement in
-## Bottery et al. (2017).
-
-## phase variation in the same G(8) repeat is in the LTEE Genomes (see Shiny app).
-## only in populations Ara-2, Ara-4, Ara+3, Ara-3. However, these mutations
-## occur in the hypermutator LTEE populations (but not Ara-1 nor Ara+6).
-
-## This paper reports that frmR represses conjugation of IncP1-alpha plasmids:
-## Isolation and Analysis of Donor Chromosomal Genes Whose Deficiency Is Responsible
-## for Accelerating Bacterial and Trans-Kingdom Conjugations by IncP1 T4SS Machinery
-## the frm operon is induced in response to formaldehyde
 
 ## idea for how to do this analysis, from Deatherage et al. (2017):
 ## We measured the similarity of genomic evolution in the TEE to the LTEE by calculating
@@ -441,7 +432,7 @@ show(relevant_card2021_mutations, allcols=true)
 ## there's no tet gene in these strains, so one of the main pathways
 ## in this paper is gene duplication/amplification of native efflux pumps.
 
-lukacisinova2020_tet_mutations = CSV.read("../data/draft-manuscript-1A/Lukacisinova2020-TET-S1Data.csv", DataFrame)
+lukacisinova2020_tet_mutations = CSV.read("../data/draft-manuscript-1A/Lukacisinova2020-TET-S1Data.tsv", DataFrame)
 
 lukacisinova_genes = unique(lukacisinova2020_tet_mutations.gene)
 
@@ -451,6 +442,6 @@ gene_in_lukacisinova_gene_column = [occursin(lukacisinova_regex, x) ? true : fal
 
 evolved_mutations.matches_lukacisinova = gene_in_lukacisinova_gene_column
 
-## minimal overlap: 8 mutations in 5 matching loci: envZ, acrR, acrA/acrR, marR, bamA
+## minimal overlap: 11 mutations in 5 matching loci: acrA/acrR, marR, soxR, lon, acrR (omit Tet0 match to argA).
 evolved_mutations_in_lukacisinova_genes = @rsubset(evolved_mutations, :matches_lukacisinova)
 

@@ -34,7 +34,7 @@ library(IRanges)
 library(GenomicRanges)
 
 ## This is not available on ARM64 yet! So the copy number annotation code isn't working right now.
-library(rtracklayer)
+##library(rtracklayer)
 
 
 #' parse the summary.html breseq output file, and return the mean and dispersion
@@ -293,7 +293,7 @@ projdir <- file.path("..")
 ## get metadata for all the evolved population metagenomes.
 metagenome.metadata <- read.csv("../data/draft-manuscript-1A/evolved-populations-and-clones.csv")
 
-mixedpop.output.dir <- file.path(projdir, "results", "draft-manuscript-1A", "genome-analysis", "mixed-pops")
+mixedpop.output.dir <- file.path(projdir, "results", "genome-analysis", "mixed-pops")
 all.mixedpops <- list.files(mixedpop.output.dir,pattern='^RM')
 all.mixedpop.paths <- sapply(all.mixedpops, function(x) file.path(mixedpop.output.dir,x))
 mixedpop.input.df <- data.frame(Sample=all.mixedpops, path=all.mixedpop.paths) %>%
@@ -352,8 +352,8 @@ Tet0.ratio.plot <- replicon.coverage.ratio.df %>%
     ggtitle("0 ug/mL tetracycline, Day 9") +
     guides(color = "none", shape = "none")
 
-ratio.figure.Fig8 <- plot_grid(Tet50.ratio.plot, Tet0.ratio.plot, labels=c('A','B'),nrow=2)
-ggsave("../results/draft-manuscript-1A/Fig8.pdf", ratio.figure.Fig8)
+ratio.figure.Fig4 <- plot_grid(Tet50.ratio.plot, Tet0.ratio.plot, labels=c('A','B'),nrow=2)
+ggsave("../results/draft-manuscript-1A/Fig4.pdf", ratio.figure.Fig4)
 
 ## let's write out the table too.
 write.csv(replicon.coverage.ratio.df, "../results/draft-manuscript-1A/plasmid-transposon-coverage-ratios.csv",

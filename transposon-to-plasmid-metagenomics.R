@@ -264,7 +264,6 @@ evolved.intergenic <- evolved.mutations %>% filter(Mutation == "intergenic") %>%
     select(-Transposon, -Mutation, -Mutation_Category, -Population)
 
 
-
 #####################################################################################
 ## examine DNA repair and DNA polymerase/replication genes for mutator and anti-mutator
 ## candidates.
@@ -576,8 +575,7 @@ parallel.mutations.in.only.Tet50 <- evolved.mutations %>%
     filter(Gene %in% parallel.genes.in.Tet50$Gene)
 
 Fig3.data <- full_join(evolved.MOB,
-                       filter(parallel.mutations.in.only.Tet50, Allele != "MOB")) %>%
-    filter(Frequency > 0.10)
+                       filter(parallel.mutations.in.only.Tet50, Allele != "MOB"))
 
 Fig3A <- MakeMutCountMatrixFigure(Fig3.data,
                                  show.all=TRUE, ## This is needed to show the MOB insertions too.
@@ -586,7 +584,7 @@ Fig3A <- MakeMutCountMatrixFigure(Fig3.data,
 Fig3.outf <- "../results/draft-manuscript-1A/Fig3A.pdf"
 ggsave(Fig3.outf, Fig3A, height=6, width=12)
 
-S1Fig <- MakeMutCountMatrixFigure(evolved.data, show.all=TRUE, use.treatment.hit.sort=FALSE)
+S1Fig <- MakeMutCountMatrixFigure(evolved.mutations, show.all=TRUE, use.treatment.hit.sort=FALSE)
 S1matrix.outf <- "../results/draft-manuscript-1A/S1Fig.pdf"
 ggsave(S1matrix.outf, S1Fig, height=8, width=12)
 
