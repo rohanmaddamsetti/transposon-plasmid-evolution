@@ -318,7 +318,9 @@ MakeMutCountMatrixFigure <- function(evolved.muts, show.all=FALSE, use.treatment
         ## unite the Transposon, Plasmid, Tet columns together.
         unite("Treatment", Transposon:Tet, sep="\n", remove = FALSE) %>%
         group_by(Gene, Sample, Transposon, Plasmid, Tet, Treatment) %>%
-        summarize(mutation.count = n())
+        summarize(mutation.count = n()) %>%
+        ## This is for sorting mutations.
+        mutate(is.MOB = ifelse(str_detect(Gene,"tetA-Tn5"), TRUE, FALSE))
     
     total.muts <- matrix.data %>%
         group_by(Gene) %>%
@@ -330,12 +332,13 @@ MakeMutCountMatrixFigure <- function(evolved.muts, show.all=FALSE, use.treatment
         matrix.data <- matrix.data %>% filter(total.mutation.count > 1)
     }
     
-    ## sort genes by number of mutations in each row.
+    ## sort genes by number of mutations in each row, but put all the transposon mutations together.
+    ## put all the transposon mutations t
     ## also check out the alternate sorting method that follows.
     gene.hit.sort <- matrix.data %>%
-        group_by(Gene, .drop = FALSE) %>%
+        group_by(Gene, is.MOB, .drop = FALSE) %>%
         summarize(hits=sum(mutation.count)) %>%
-        arrange(desc(hits))
+        arrange(desc(is.MOB), desc(hits))
     
     ## now sort genes.
     if (use.treatment.hit.sort) {
@@ -343,16 +346,16 @@ MakeMutCountMatrixFigure <- function(evolved.muts, show.all=FALSE, use.treatment
         ## AKA the (absolute value of the) difference in number of pops with hits
         ## between the None and pUC treatments.
         pUC.hit.count.df <- filter(matrix.data,Plasmid=="pUC") %>%
-            group_by(Gene, .drop = FALSE) %>%
+            group_by(Gene, is.MOB, .drop = FALSE) %>%
             summarize(pUC.hit.count=n())
         
         noPlasmid.hit.count.df <- filter(matrix.data,Plasmid=="None") %>%
-            group_by(Gene, .drop = FALSE) %>%
+            group_by(Gene, is.MOB, .drop = FALSE) %>%
             summarize(noPlasmid.hit.count=n())
         
         treatment.hit.sort <- full_join(pUC.hit.count.df, noPlasmid.hit.count.df) %>%
             mutate(hit.diff = pUC.hit.count - noPlasmid.hit.count) %>%
-            arrange(desc(hit.diff))
+            arrange(desc(is.MOB), desc(hit.diff))
 
         ## cast Gene into a factor for plotting.
         matrix.data$Gene <- factor(matrix.data$Gene,levels=rev(treatment.hit.sort$Gene))
@@ -390,7 +393,6 @@ MakeMutCountMatrixFigure <- function(evolved.muts, show.all=FALSE, use.treatment
     }
 
     
-
     ## make Tet50 panels.
     B20.noPlasmid.Tet50.matrix.panel <- make.matrix.panel(matrix.data, "B20\nNone\n50")
     ## Remove the gene labels to save space.
@@ -417,6 +419,7 @@ MakeMutCountMatrixFigure <- function(evolved.muts, show.all=FALSE, use.treatment
         plot_layout(nrow = 1)
     return(matrix.figure)
 }
+
 
 ## Use summed allele frequency for the heatmap.
 MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
@@ -583,7 +586,7 @@ Fig3A <- MakeMutCountMatrixFigure(Fig3.data,
 Fig3.outf <- "../results/draft-manuscript-1A/Fig3A.pdf"
 ggsave(Fig3.outf, Fig3A, height=6, width=12)
 
-S1Fig <- MakeMutCountMatrixFigure(Fig3.data, show.all=TRUE, use.treatment.hit.sort=FALSE)
+S1Fig <- MakeMutCountMatrixFigure(evolved.data, show.all=TRUE, use.treatment.hit.sort=FALSE)
 S1matrix.outf <- "../results/draft-manuscript-1A/S1Fig.pdf"
 ggsave(S1matrix.outf, S1Fig, height=8, width=12)
 
