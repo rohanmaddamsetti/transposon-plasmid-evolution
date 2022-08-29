@@ -74,11 +74,10 @@ evolved.mutations <- read.csv(
 fixations <- filter(evolved.mutations, Frequency == 1.0)
 
 ###############################################
-## Figure 2AB: Plot the distribution of measured allele frequencies in each population.
-
+## Figure 2A: Plot the distribution of measured allele frequencies in each population.
 make.allele.freq.histogram <- function(evolved.mutations.df, my.title,annotate=FALSE) {
     p <- ggplot(evolved.mutations.df, aes(x=Frequency)) +
-        geom_histogram(bins = 100) +
+        geom_histogram(bins = 200) +
         theme_classic() +
         ylab("Count") +
         xlab("Allele Frequency") +
@@ -87,7 +86,7 @@ make.allele.freq.histogram <- function(evolved.mutations.df, my.title,annotate=F
         facet_grid(Plasmid~.) +
     geom_vline(xintercept=0.10,color="red",linetype="dashed",size=0.2)
 
-    muts.to.label <- filter(evolved.mutations.df, Frequency>0.25)
+    muts.to.label <- filter(evolved.mutations.df, Frequency>0.5)
     if (annotate && nrow(muts.to.label) > 0) {
         p <- p +
             geom_text_repel(
@@ -114,13 +113,15 @@ Fig2B <- make.allele.freq.histogram(Tet50.evolved.mutations, "Tet 50 populations
 ## to see if false positive mutation calls arise when coverage is ~40X rather than
 ## 300X.
 
-Fig2AB <- Fig2A + Fig2B
+## IMPORTANT TODO: There seems to be a bug in which "missing data" is removed, but right now I have
+## no idea what this is about or what is being removed from the plot. Figure this out!!!
+Fig2AB <- plot_grid(Fig2A, Fig2B, labels = c('A','B'))
 fig2AB.output <- "../results/draft-manuscript-1A/Fig2AB.pdf"
 ggsave(Fig2AB, file=fig2AB.output,width=10,height=4)
 
 ###############################################
-## Figure 2C: make a stacked bar plot of the kinds of mutations in each treatment.
-## Figure 2D: make a stacked bar plot of the kinds of mutations in each treatment, weighted by allele frequency.
+## Supplementary Figure 1: make a stacked bar plot of the kinds of mutations in each treatment.
+## Figure 2C: make a stacked bar plot of the kinds of mutations in each treatment, weighted by allele frequency.
 
 ## This function sums mutations per replicate population.
 make.mutation.class.df <- function(evolved.mutations.df) {
@@ -181,26 +182,22 @@ plot.mutation.summary.stackbar <- function(mutation.class.df, leg=FALSE, weight.
     return(fig)
 }
 
-## Now make Figure 2CD.
+## Now make S2Fig and Figure 2C.
 mutation.class.df <- make.mutation.class.df(evolved.mutations) %>%
     mutate(Tet=recode(Tet,
                       `0` = "Tet 0",
                       `50` = "Tet 50"))
 
-fig2C <- plot.mutation.summary.stackbar(mutation.class.df, FALSE, FALSE) 
-## Repeat, but weight by allele frequency.
-fig2D <- plot.mutation.summary.stackbar(mutation.class.df, TRUE, TRUE)
-## pull the legend from fig2D
-fig2CDlegend <- cowplot::get_legend(fig2D)
-## and remove the legend from fig2D
-fig2D <- fig2D + guides(fill = "none")
+FigS2 <- plot.mutation.summary.stackbar(mutation.class.df, FALSE, FALSE)
+ggsave(FigS1, file="../results/draft-manuscript-1A/S2Fig.pdf")
 
-fig2CD <- fig2C + fig2D
-full.fig2CD <- plot_grid(fig2CD, fig2CDlegend,nrow=2, rel_heights = c(1, 0.1))
+## Repeat, but weight by allele frequency. This goes into
+Fig2C <- plot.mutation.summary.stackbar(mutation.class.df, TRUE, TRUE)
 
-## save figure 2CD.
-fig2CD.output <- "../results/draft-manuscript-1A/Fig2CD.pdf"
-ggsave(full.fig2CD, file=fig2CD.output,width=8,height=5)
+Fig2 <- plot_grid(Fig2AB, Fig2C, labels = c('','C'),nrow=2)
+## save figure 2.
+fig2.output <- "../results/draft-manuscript-1A/Fig2.pdf"
+ggsave(Fig2, file=fig2.output,width=8,height=8)
 
 
 ################################################################################
