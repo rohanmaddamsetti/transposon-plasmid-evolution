@@ -63,41 +63,15 @@ pop.clone.labels <- read.csv(
             "data/draft-manuscript-1A/evolved-populations-and-clones.csv"),
   stringsAsFactors=FALSE)
 
-
-## there's the issue of parallelism of high frequency mutations,
-## and parallelism of low frequency mutations. Both are important!
-## TODO: Dissect the two cases carefully.
-
+## This is the key data file for the analysis.
 evolved.mutations <- read.csv(
     file.path(projdir,
               "results/genome-analysis/evolved_mutations.csv"),
     stringsAsFactors=FALSE) %>%
-    ## rotate genome coordinates based on oriC.
-    mutate(oriC.coordinate=rotate.NEB5alpha.chr(Position)) %>%
-    mutate(Mbp.coordinate=oriC.coordinate/1000000)
+    mutate(Mbp.coordinate=Position/1000000)
 
-
-high.freq.evolved.mutations <- evolved.mutations %>%
-    filter(Frequency > 0.5)
-
-
-B30.evolved.mutations <- evolved.mutations %>%
-    filter(Transposon == "B30")
-
-B20.evolved.mutations <- evolved.mutations %>%
-    filter(Transposon == "B20")
-
-B30.Tet0.evolved.mutations <- B30.evolved.mutations %>%
-    filter(Tet==0)
-
-B30.Tet50.evolved.mutations <- B30.evolved.mutations %>%
-    filter(Tet==50)
-
-B20.Tet0.evolved.mutations <- B20.evolved.mutations %>%
-    filter(Tet==0)
-
-B20.Tet50.evolved.mutations <- B20.evolved.mutations %>%
-    filter(Tet==50)
+## examine fixed mutations. All are in the Tet 50 treatment.
+fixations <- filter(evolved.mutations, Frequency == 1.0)
 
 ###############################################
 ## Figure 2AB: Plot the distribution of measured allele frequencies in each population.
@@ -229,8 +203,7 @@ fig2CD.output <- "../results/draft-manuscript-1A/Fig2CD.pdf"
 ggsave(full.fig2CD, file=fig2CD.output,width=8,height=5)
 
 
-#####################################################################################
-
+################################################################################
 ## let's take a close look at the different kinds of evolved mutations.
 
 ## ALL of these MOB insertions are miniTn5-Tet insertions, either into the KanR gene
@@ -264,7 +237,7 @@ evolved.intergenic <- evolved.mutations %>% filter(Mutation == "intergenic") %>%
     select(-Transposon, -Mutation, -Mutation_Category, -Population)
 
 
-#####################################################################################
+################################################################################
 ## examine DNA repair and DNA polymerase/replication genes for mutator and anti-mutator
 ## candidates.
 
@@ -294,7 +267,7 @@ parallel.dN.Table <- filter(evolved.mutations, Position %in% parallel.AA.dN$Posi
 parallel.dS.Table <- filter(evolved.mutations, Position %in% parallel.dS$Position) %>% arrange(Position)
 
 
-##################################################################################
+#################################################################################
 ## analysis of parallel evolution at the gene level (including intergenic regions).
 
 gene.level.parallel.mutations <- evolved.mutations %>% group_by(Gene) %>%
@@ -305,9 +278,7 @@ parallel.genes <- gene.level.parallel.mutations %>%
     distinct() %>%
     arrange(desc(count))
 
-
-
-################################################################################
+#################################################################################
 ### Figure 3: make a matrix plot of genes with mutations in two or more clones.
 ################################################################################
 MakeMutCountMatrixFigure <- function(evolved.muts, show.all=FALSE, use.treatment.hit.sort=FALSE) {
