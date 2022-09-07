@@ -459,7 +459,9 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
                   axis.title.y = element_blank(),
                   ) +
             scale_y_discrete(drop=FALSE) + ## don't drop missing genes.
+            theme(legend.position = "bottom") + ## arrange the legend on the bottom.
             scale_fill_viridis_c(option = "inferno", limits = c(0,1)) ## important: need a uniform scale across samples.
+        
 
         if (leg == FALSE) {
             fig <- fig + guides(fill= "none")
@@ -468,19 +470,26 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
     }
     
 
-    B20.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\nNone\n50", FALSE)
+    B20.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\nNone\n50", add.legend)
     ## Remove the gene labels for the additional matrices to save space.
-    B20.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\np15A\n50", FALSE)  +
+    B20.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\np15A\n50", add.legend)  +
         theme(axis.text.y=element_blank())
-    B20.A18.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\npUC\n50", FALSE)  +
+    B20.A18.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\npUC\n50", add.legend)  +
         theme(axis.text.y=element_blank())
     
-    B30.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\nNone\n50", FALSE)  +
+    B30.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\nNone\n50", add.legend)  +
         theme(axis.text.y=element_blank())
-    B30.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\np15A\n50", FALSE)  +
+    B30.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\np15A\n50", add.legend)  +
         theme(axis.text.y=element_blank())
     B30.A18.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\npUC\n50", add.legend)  +
         theme(axis.text.y=element_blank())
+
+    if (add.legend) {
+        ## get the legend from the last panel.
+        my.legend <- get_legend(B30.A18.Tet50.matrix.panel)
+        ## now remove the legend from the panel.
+        B30.A18.Tet50.matrix.panel <- B30.A18.Tet50.matrix.panel + guides(fill = "none")
+    }
     
     ## Using the patchwork library for layout.
     matrix.figure <-
@@ -490,7 +499,8 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
         B30.A31.Tet50.matrix.panel +
         B20.A18.Tet50.matrix.panel +
         B30.A18.Tet50.matrix.panel +
-        plot_layout(nrow = 1)
+        plot_layout(nrow = 1) +
+        plot_layout(guides = "collect") & theme(legend.position = 'bottom')
 
     return(matrix.figure)
 }
@@ -555,9 +565,9 @@ ggsave(Fig3.outf, Fig3A, height=6, width=12)
 
 S1Fig <- MakeMutCountMatrixFigure(evolved.mutations, show.all=TRUE, use.treatment.hit.sort=FALSE)
 S1matrix.outf <- "../results/draft-manuscript-1A/S1Fig.pdf"
-ggsave(S1matrix.outf, S1Fig, height=8, width=12)
+ggsave(S1matrix.outf, S1Fig, height=20, width=12)
 
-Fig3B <- MakeSummedAlleleFrequencyMatrixFigure(Fig3.data, show.all=TRUE, use.treatment.hit.short=FALSE)
+Fig3B <- MakeSummedAlleleFrequencyMatrixFigure(Fig3.data, show.all=TRUE, use.treatment.hit.sort=FALSE)
 Fig3B.matrix.outf <- "../results/draft-manuscript-1A/Fig3B.pdf"
 ggsave(Fig3B.matrix.outf, Fig3B, height=8, width=12)
 
