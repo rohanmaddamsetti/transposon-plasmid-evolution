@@ -188,8 +188,8 @@ mutation.class.df <- make.mutation.class.df(evolved.mutations) %>%
                       `0` = "Tet 0",
                       `50` = "Tet 50"))
 
-FigS2 <- plot.mutation.summary.stackbar(mutation.class.df, FALSE, FALSE)
-ggsave(FigS1, file="../results/draft-manuscript-1A/S2Fig.pdf")
+S2Fig <- plot.mutation.summary.stackbar(mutation.class.df, FALSE, FALSE)
+ggsave(S2Fig, file="../results/draft-manuscript-1A/S2Fig.pdf")
 
 ## Repeat, but weight by allele frequency. This goes into
 Fig2C <- plot.mutation.summary.stackbar(mutation.class.df, TRUE, TRUE)
@@ -390,8 +390,10 @@ MakeMutCountMatrixFigure <- function(evolved.muts, show.all=FALSE, use.treatment
 
 ## Use summed allele frequency for the heatmap.
 MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
-                                                  allele.freq.threshold = 0.2,
-                                                  show.all=FALSE) {
+                                                  allele.freq.threshold = 0.20, ## this parameter only matters if show.all == FALSE.
+                                                  show.all=FALSE, ## if TRUE, all mutations are shown, regardless of allele frequency.
+                                                  use.treatment.hit.sort=FALSE,
+                                                  add.legend = TRUE) {
 
     ## First, make a mutation matrix for plotting.
     matrix.data <- evolved.muts %>%
@@ -434,14 +436,13 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
         arrange(desc(allele.diff))
 
     ## sort the genes.
-    use.treatment.mut.sort <- TRUE
-    if (use.treatment.mut.sort) {
+    if (use.treatment.hit.sort) {
         matrix.data$Gene <- factor(matrix.data$Gene,levels=rev(treatment.freq.sort$Gene))
     } else {
         matrix.data$Gene <- factor(matrix.data$Gene,levels=rev(gene.freq.sort$Gene))
     }
 
-    make.allele.freq.matrix.panel <- function(mdata, treatment, leg=FALSE) {
+    make.allele.freq.matrix.panel <- function(mdata, treatment, leg=use.legend) {
         fig <- ggplot(filter(mdata,Treatment==treatment),
                       aes(x=Sample,
                           y=Gene,
@@ -458,7 +459,7 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
                   axis.title.y = element_blank(),
                   ) +
             scale_y_discrete(drop=FALSE) + ## don't drop missing genes.
-            scale_fill_viridis_c(option = "inferno")
+            scale_fill_viridis_c(option = "inferno", limits = c(0,1)) ## important: need a uniform scale across samples.
 
         if (leg == FALSE) {
             fig <- fig + guides(fill= "none")
@@ -467,18 +468,18 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
     }
     
 
-    B20.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\nNone\n50")
+    B20.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\nNone\n50", FALSE)
     ## Remove the gene labels for the additional matrices to save space.
-    B20.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\np15A\n50")  +
+    B20.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\np15A\n50", FALSE)  +
         theme(axis.text.y=element_blank())
-    B20.A18.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\npUC\n50")  +
+    B20.A18.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\npUC\n50", FALSE)  +
         theme(axis.text.y=element_blank())
     
-    B30.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\nNone\n50")  +
+    B30.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\nNone\n50", FALSE)  +
         theme(axis.text.y=element_blank())
-    B30.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\np15A\n50")  +
+    B30.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\np15A\n50", FALSE)  +
         theme(axis.text.y=element_blank())
-    B30.A18.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\npUC\n50")  +
+    B30.A18.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\npUC\n50", add.legend)  +
         theme(axis.text.y=element_blank())
     
     ## Using the patchwork library for layout.
@@ -556,11 +557,12 @@ S1Fig <- MakeMutCountMatrixFigure(evolved.mutations, show.all=TRUE, use.treatmen
 S1matrix.outf <- "../results/draft-manuscript-1A/S1Fig.pdf"
 ggsave(S1matrix.outf, S1Fig, height=8, width=12)
 
-
-Fig3B <- MakeSummedAlleleFrequencyMatrixFigure(Fig3.data, show.all=T)
+Fig3B <- MakeSummedAlleleFrequencyMatrixFigure(Fig3.data, show.all=TRUE, use.treatment.hit.short=FALSE)
 Fig3B.matrix.outf <- "../results/draft-manuscript-1A/Fig3B.pdf"
 ggsave(Fig3B.matrix.outf, Fig3B, height=8, width=12)
 
-Fig7singles <- MakeSummedAlleleFrequencyMatrixFigure(evolved.mutations, show.all=T)
-ggsave("../results/draft-manuscript-1A/Fig7-singles.pdf", Fig7singles, height=20, width=12)
+## This is an important Supplementary figure. Show the frequencies of all evolved mutations,
+## that passed the quality filters that I set up in breseq.
+S3Fig <- MakeSummedAlleleFrequencyMatrixFigure(evolved.mutations, show.all=TRUE,  use.treatment.hit.sort=FALSE)
+ggsave("../results/draft-manuscript-1A/S3Fig.pdf", S3Fig, height=20, width=12)
 
