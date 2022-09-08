@@ -296,11 +296,11 @@ MakeMutCountMatrixFigure <- function(evolved.muts, show.all=FALSE, use.treatment
     matrix.data <- left_join(matrix.data, total.muts)
     
     if (!show.all) { ## then filter out genes that are only hit in one sample.
-        matrix.data <- matrix.data %>% filter(total.mutation.count > 1)
+        matrix.data <- matrix.data %>%
+            filter(total.mutation.count > 1)
     }
     
     ## sort genes by number of mutations in each row, but put all the transposon mutations together.
-    ## put all the transposon mutations t
     ## also check out the alternate sorting method that follows.
     gene.hit.sort <- matrix.data %>%
         group_by(Gene, is.MOB, .drop = FALSE) %>%
@@ -400,25 +400,29 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
         ## unite the Transposon, Plasmid, Tet columns together.
         unite("Treatment", Transposon:Tet, sep="\n", remove = FALSE) %>%
         group_by(Gene, Sample, Transposon, Plasmid, Tet, Treatment) %>%
-        summarize(summed.Allele.Frequency = sum(Frequency))
-    
+        summarize(summed.Allele.Frequency = sum(Frequency)) %>%
+        ## This is for sorting mutations.
+        mutate(is.MOB = ifelse(str_detect(Gene,"tetA-Tn5"), TRUE, FALSE))
+
     total.allele.freqs <- matrix.data %>%
         group_by(Gene, .drop = FALSE) %>%
         summarize(total.Allele.Frequency = sum(summed.Allele.Frequency))
 
+    matrix.data <- left_join(matrix.data, total.allele.freqs)
+    
     ## filter matrix.data for genes that pass the allele frequency threshold,
     ## based on total allele frequency summed across all pops.
     if (!show.all) {
-        matrix.data <- left_join(matrix.data, total.allele.freqs) %>%
+        matrix.data <- matrix.data %>%
             filter(total.Allele.Frequency > allele.freq.threshold)
     }
 
-    ## sort genes by the total allele frequency in each row.
+    ## sort genes by the total allele frequency in each row, but put all the transposon mutations together.
     ## also check out the alternate sorting method that follows.
     gene.freq.sort <- matrix.data %>%
-        group_by(Gene, .drop = FALSE) %>%
+        group_by(Gene, is.MOB, .drop = FALSE) %>%
         summarize(totalallelefreq = sum(summed.Allele.Frequency)) %>%
-        arrange(desc(totalallelefreq))
+        arrange(desc(is.MOB), desc(totalallelefreq))
     
     ## alternative sorting method:
     ## difference in allele frequency between the pUC and noPlasmid treatments..
