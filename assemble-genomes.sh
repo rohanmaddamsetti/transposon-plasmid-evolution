@@ -238,21 +238,33 @@
 ## idea instead of spike-in: assemble ancestral clones using polymorphism mode. if false positives are higher with pUC,
 ## then pUC ancestor clones should have more "polymorphism" than the other ancestors, despite being clonal.
 
-sbatch --mem=2G -c 1 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-60-5 -r ../results/genome-analysis/RM6-176-18.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_60_5/*.fastq.gz"
+sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-60-5 -r ../results/genome-analysis/RM6-176-18.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_60_5/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-147-1 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210630/063021_150/*.fastq.gz"
+sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-147-1 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210630/063021_150/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-147-2 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210630/063021_151/*.fastq.gz"
+sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-147-2 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210630/063021_151/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-176-18 -r ../results/genome-analysis/RM6-176-18.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210805/RM6_176_18/*.fastq.gz"
+sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-176-18 -r ../results/genome-analysis/RM6-176-18.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210805/RM6_176_18/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-200-6 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210917/RM6_200_6/*.fastq.gz"
+sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-200-6 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210917/RM6_200_6/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-1 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_1/*.fastq.gz"
+sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-1 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_1/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/rRM7-72-2 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_2/*.fastq.gz"
+sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-2 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_2/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-3 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_3/*.fastq.gz"
+sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-3 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_3/*.fastq.gz"
 
-sbatch --mem=2G -c 1 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-4 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_4/*.fastq.gz"
+sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-4 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_4/*.fastq.gz"
+
+################################################################################
+## new assemblies with B59. CRITICAL TODO: double-check the genome IDs with my notebook, before running.
+
+## assemble the B59 ancestral strain using the NEB5-alpha-NZ_CP017100.gb reference genome.
+#sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-97-1 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B59-miniTn5-TetA.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_1/*.fastq.gz"
+
+## assemble the B59 + p15A ancestral strain using the NEB5-alpha-NZ_CP017100.gb reference genome.
+#sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-97-2 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B59-miniTn5-TetA.gb -r ../data/genome-sequencing/A31-p15A.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_2/*.fastq.gz"
+
+## assemble the B20 + pUC ancestral strain using the NEB5-alpha-NZ_CP017100.gb reference genome.
+#sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-97-3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B59-miniTn5-TetA.gb -r ../data/genome-sequencing/A18-pUC.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_3/*.fastq.gz"
 
