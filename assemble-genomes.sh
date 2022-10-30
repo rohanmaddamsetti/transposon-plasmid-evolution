@@ -42,13 +42,13 @@
 
 ## NOTE: the output GFF3 files are combined references for the chromosome, the transposon, and the plasmid.
 
+## apply mutations in the ancestral B30+A18 (pUC) genome, RM6-176-18, to the NEB5-alpha-NZ_CP017100.gb reference genome.
 ##gdtools APPLY -o ../results/genome-analysis/RM6-176-18.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb -r ../data/genome-sequencing/A18-pUC.gb ../results/genome-analysis/RM6-176-18/output/output.gd
 
 ## apply mutations in the ancestral B30+noplasmid genome, RM6-200-6, to the NEB5-alpha-NZ_CP017100.gb reference genome.
-
 ##gdtools APPLY -o ../results/genome-analysis/RM6-200-6.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb ../results/genome-analysis/RM6-200-6/output/output.gd
 
-## apply mutations in the ancestral B30+A31 genome, RM7-72-1, to the NEB5-alpha-NZ_CP017100.gb reference genome.
+## apply mutations in the ancestral B30+A31 (p15A) genome, RM7-72-1, to the NEB5-alpha-NZ_CP017100.gb reference genome.
 ##gdtools APPLY -o ../results/genome-analysis/RM7-72-1.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B30-miniTn5-TetA.gb -r ../data/genome-sequencing/A31-p15A.gb ../results/genome-analysis/RM7-72-1/output/output.gd
 
 ## apply mutations in the ancestral B20+pUC genome, RM7-72-2, to the NEB5-alpha-NZ_CP017100.gb reference genome.
@@ -238,23 +238,23 @@
 ## idea instead of spike-in: assemble ancestral clones using polymorphism mode. if false positives are higher with pUC,
 ## then pUC ancestor clones should have more "polymorphism" than the other ancestors, despite being clonal.
 
-sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-60-5 -r ../results/genome-analysis/RM6-176-18.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_60_5/*.fastq.gz"
+#sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-60-5 -r ../results/genome-analysis/RM6-176-18.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti220509/RM7_60_5/*.fastq.gz"
 
-sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-147-1 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210630/063021_150/*.fastq.gz"
+#sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-147-1 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210630/063021_150/*.fastq.gz"
 
-sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-147-2 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210630/063021_151/*.fastq.gz"
+#sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-147-2 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210630/063021_151/*.fastq.gz"
 
-sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-176-18 -r ../results/genome-analysis/RM6-176-18.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210805/RM6_176_18/*.fastq.gz"
+#sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-176-18 -r ../results/genome-analysis/RM6-176-18.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210805/RM6_176_18/*.fastq.gz"
 
-sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-200-6 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210917/RM6_200_6/*.fastq.gz"
+#sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM6-200-6 -r ../results/genome-analysis/RM6-200-6.gff3 ../data/genome-sequencing/MiGS_RohanMaddamsetti210917/RM6_200_6/*.fastq.gz"
 
-sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-1 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_1/*.fastq.gz"
+#sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-1 -r ../results/genome-analysis/RM7-72-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_1/*.fastq.gz"
 
-sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-2 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_2/*.fastq.gz"
+#sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-2 -r ../results/genome-analysis/RM7-72-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_2/*.fastq.gz"
 
-sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-3 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_3/*.fastq.gz"
+#sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-3 -r ../results/genome-analysis/RM7-72-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_3/*.fastq.gz"
 
-sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-4 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_4/*.fastq.gz"
+#sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/clone-polymorphism-test/RM7-72-4 -r ../results/genome-analysis/RM7-72-4.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti220702/RM7_72_4/*.fastq.gz"
 
 ################################################################################
 ## new assemblies with B59. CRITICAL TODO: double-check the genome IDs with my notebook, before running.
@@ -268,3 +268,98 @@ sbatch --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-cover
 ## assemble the B20 + pUC ancestral strain using the NEB5-alpha-NZ_CP017100.gb reference genome.
 #sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/RM7-97-3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B59-miniTn5-TetA.gb -r ../data/genome-sequencing/A18-pUC.gb ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_3/*.fastq.gz"
 
+################################################################################
+
+## apply mutations in the ancestral B59 genome to the NEB5-alpha-NZ_CP017100.gb reference genome.
+#gdtools APPLY -o ../results/genome-analysis/RM7-97-1.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B59-miniTn5-TetA.gb ../results/genome-analysis/RM7-97-1/output/output.gd
+
+## apply mutations in the ancestral B59+p15A genome to the NEB5-alpha-NZ_CP017100.gb reference genome.
+#gdtools APPLY -o ../results/genome-analysis/RM7-97-2.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B59-miniTn5-TetA.gb -r ../data/genome-sequencing/A31-p15A.gb ../results/genome-analysis/RM7-97-2/output/output.gd
+
+## apply mutations in the ancestral B59+pUC genome to the NEB5-alpha-NZ_CP017100.gb reference genome.
+#gdtools APPLY -o ../results/genome-analysis/RM7-97-3.gff3 -f GFF3 -r ../data/genome-sequencing/NEB5-alpha-NZ_CP017100.gb -r ../data/genome-sequencing/B59-miniTn5-TetA.gb -r ../data/genome-sequencing/A18-pUC.gb ../results/genome-analysis/RM7-97-3/output/output.gd
+
+################################################################################
+## now, test the new references, by re-mapping reads.
+
+#sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/clones/remapped-RM7-97-1 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_1/*.fastq.gz"
+
+#sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/clones/remapped-RM7-97-2 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_2/*.fastq.gz"
+
+#sbatch --mem=2G -c 1 --wrap="breseq -o ../results/genome-analysis/clones/remapped-RM7-97-3 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_3/*.fastq.gz"
+
+################################################################################
+## now assemble evolved mixed population samples with respect to their ancestor.
+## set the minimum Phred score threshold for base quality to be 30, and polymorphic sites must have at least 4 reads on each strand supporting the mutation.
+## Only allow 5 max mismatches between the read and the reference.
+
+## RM7.97.4-8 are B59 + no plasmid Tet 0 evolved pops 1-5.
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-4 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_4/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-5 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_5/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-6 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_6/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-7 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_7/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-8 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_8/*.fastq.gz"
+
+
+## RM7.97.9-13 are B59 + no plasmid Tet 50 evolved pops 1-5.
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-9 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_9/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-10 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_10/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-11 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_11/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-12 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_12/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-13 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_13/*.fastq.gz"
+
+
+## RM7.97.14-18 are B59 + p15A Tet 0 evolved pops 1-5.
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-14 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_14/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-15 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_15/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-16 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_16/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-17 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_17/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-18 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_18/*.fastq.gz"
+
+
+## RM7.97.19-23 are B59 + p15A Tet 50 evolved pops 1-5.
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-19 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_19/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-20 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_20/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-21 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_21/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-22 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_22/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-23 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_23/*.fastq.gz"
+
+
+## RM7.97.24-28 are B59 + pUC Tet 0 evolved pops 1-5.
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-24 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_24/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-25 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_25/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-26 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_26/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-27 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_27/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-28 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_28/*.fastq.gz"
+
+
+## RM7.97.29-33 are B59 + pUC Tet 50 evolved pops 1-5.
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-29 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_29/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-30 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_30/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-31 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_31/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-32 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_32/*.fastq.gz"
+
+sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-33 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_33/*.fastq.gz"
