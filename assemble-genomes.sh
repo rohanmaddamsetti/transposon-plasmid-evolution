@@ -294,72 +294,72 @@
 ## Only allow 5 max mismatches between the read and the reference.
 
 ## RM7.97.4-8 are B59 + no plasmid Tet 0 evolved pops 1-5.
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-4 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_4/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-4 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_4/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-5 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_5/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-5 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_5/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-6 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_6/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-6 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_6/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-7 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_7/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-7 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_7/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-8 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_8/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-8 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_8/*.fastq.gz"
 
 
 ## RM7.97.9-13 are B59 + no plasmid Tet 50 evolved pops 1-5.
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-9 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_9/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-9 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_9/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-10 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_10/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-10 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_10/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-11 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_11/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-11 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_11/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-12 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_12/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-12 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_12/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-13 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_13/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-13 -r ../results/genome-analysis/RM7-97-1.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_13/*.fastq.gz"
 
 
 ## RM7.97.14-18 are B59 + p15A Tet 0 evolved pops 1-5.
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-14 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_14/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-14 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_14/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-15 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_15/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-15 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_15/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-16 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_16/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-16 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_16/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-17 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_17/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-17 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_17/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-18 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_18/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-18 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_18/*.fastq.gz"
 
 
 ## RM7.97.19-23 are B59 + p15A Tet 50 evolved pops 1-5.
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-19 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_19/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-19 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_19/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-20 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_20/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-20 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_20/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-21 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_21/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-21 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_21/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-22 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_22/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-22 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_22/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-23 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_23/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-23 -r ../results/genome-analysis/RM7-97-2.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_23/*.fastq.gz"
 
 
 ## RM7.97.24-28 are B59 + pUC Tet 0 evolved pops 1-5.
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-24 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_24/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-24 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_24/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-25 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_25/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-25 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_25/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-26 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_26/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-26 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_26/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-27 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_27/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-27 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_27/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-28 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_28/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-28 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_28/*.fastq.gz"
 
 
 ## RM7.97.29-33 are B59 + pUC Tet 50 evolved pops 1-5.
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-29 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_29/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-29 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_29/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-30 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_30/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-30 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_30/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-31 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_31/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-31 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_31/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-32 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_32/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-32 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_32/*.fastq.gz"
 
-sbatch -p scavenger --mem=8G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-33 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_33/*.fastq.gz"
+sbatch -p scavenger --mem=16G -c 8 --wrap="breseq -j 8 -p --polymorphism-minimum-variant-coverage-each-strand 4 -b 30 --maximum-read-mismatches 5 -o ../results/genome-analysis/mixed-pops/RM7-97-33 -r ../results/genome-analysis/RM7-97-3.gff3 ../data/genome-sequencing/SeqCenter_RohanMaddamsetti221029/RM7_97_33/*.fastq.gz"

@@ -68,7 +68,22 @@ evolved.mutations <- read.csv(
     file.path(projdir,
               "results/genome-analysis/evolved_mutations.csv"),
     stringsAsFactors=FALSE) %>%
-    mutate(Mbp.coordinate=Position/1000000)
+    mutate(Mbp.coordinate=Position/1000000) %>%
+        ## remove the pUC samples from the analysis.
+    filter(Plasmid != "pUC") %>%
+    ## update the names of the Transposon factor for a prettier plot.
+    mutate(Transposon_factor = fct_recode(as.factor(Transposon),
+                                          `Tn5+ (TetA++)` = "B30",
+                                          `Tn5+ (TetA+)` = "B20",
+                                          `Tn5- (TetA++)` = "B59")) %>%
+    ## update the names of the Plasmid factor for a prettier plot.
+    mutate(Plasmid_factor = fct_recode(as.factor(Plasmid),
+                                       `No plasmid` = "None",
+                                       p15A = "p15A")) %>%
+    mutate(Tet_factor = fct_recode(as.factor(Tet),
+                                   `Tet 0` = "0",
+                                   `Tet 50` = "50"))
+
 
 ## examine fixed mutations. All are in the Tet 50 treatment.
 fixations <- filter(evolved.mutations, Frequency == 1.0)
@@ -282,8 +297,8 @@ MakeMutCountMatrixFigure <- function(evolved.muts, show.all=FALSE, use.treatment
 
     ## First, make a mutation matrix for plotting.
     matrix.data <- evolved.muts %>%
-        ## unite the Transposon, Plasmid, Tet columns together.
-        unite("Treatment", Transposon:Tet, sep="\n", remove = FALSE) %>%
+        ## unite the Transposon_factor, Plasmid_factor, Tet_factor columns together.
+        unite("Treatment", Transposon_factor:Tet_factor, sep="\n", remove = FALSE) %>%
         group_by(Gene, Sample, Transposon, Plasmid, Tet, Treatment) %>%
         summarize(mutation.count = n()) %>%
         ## This is for sorting mutations.
@@ -311,17 +326,17 @@ MakeMutCountMatrixFigure <- function(evolved.muts, show.all=FALSE, use.treatment
     if (use.treatment.hit.sort) {
         ## alternate sorting method: difference in hits between environments,
         ## AKA the (absolute value of the) difference in number of pops with hits
-        ## between the None and pUC treatments.
-        pUC.hit.count.df <- filter(matrix.data,Plasmid=="pUC") %>%
+        ## between the None and p15A treatments.
+        p15A.hit.count.df <- filter(matrix.data,Plasmid=="pUC") %>%
             group_by(Gene, is.MOB, .drop = FALSE) %>%
-            summarize(pUC.hit.count=n())
+            summarize(p15A.hit.count=n())
         
         noPlasmid.hit.count.df <- filter(matrix.data,Plasmid=="None") %>%
             group_by(Gene, is.MOB, .drop = FALSE) %>%
             summarize(noPlasmid.hit.count=n())
         
-        treatment.hit.sort <- full_join(pUC.hit.count.df, noPlasmid.hit.count.df) %>%
-            mutate(hit.diff = pUC.hit.count - noPlasmid.hit.count) %>%
+        treatment.hit.sort <- full_join(p15A.hit.count.df, noPlasmid.hit.count.df) %>%
+            mutate(hit.diff = p15A.hit.count - noPlasmid.hit.count) %>%
             arrange(desc(is.MOB), desc(hit.diff))
 
         ## cast Gene into a factor for plotting.
@@ -354,35 +369,37 @@ MakeMutCountMatrixFigure <- function(evolved.muts, show.all=FALSE, use.treatment
                               values = c("#ffdf00", "#bebada", "#fb8072", "#80b1d3", "#fdb462"))
         
         if (leg == FALSE) {
-            fig <- fig + guides(fill= "none")
+            fig <- fig + guides(fill = "none")
         }
         return(fig)
     }
 
     
     ## make Tet50 panels.
-    B20.noPlasmid.Tet50.matrix.panel <- make.matrix.panel(matrix.data, "B20\nNone\n50")
+    B59.noPlasmid.Tet50.matrix.panel <- make.matrix.panel(matrix.data, "Tn5- (TetA++)\nNo plasmid\nTet 50")
     ## Remove the gene labels to save space.
-    B20.A31.Tet50.matrix.panel <- make.matrix.panel(matrix.data, "B20\np15A\n50") +
-        theme(axis.text.y=element_blank())
-    B20.A18.Tet50.matrix.panel <- make.matrix.panel(matrix.data, "B20\npUC\n50") +
+    B59.A31.Tet50.matrix.panel <- make.matrix.panel(matrix.data, "Tn5- (TetA++)\np15A\nTet 50") +
         theme(axis.text.y=element_blank())
     
-    B30.noPlasmid.Tet50.matrix.panel <- make.matrix.panel(matrix.data,"B30\nNone\n50") +
+    B20.noPlasmid.Tet50.matrix.panel <- make.matrix.panel(matrix.data, "Tn5+ (TetA+)\nNo plasmid\nTet 50") +
         theme(axis.text.y=element_blank())
-    B30.A31.Tet50.matrix.panel <- make.matrix.panel(matrix.data, "B30\np15A\n50") +
+
+    B20.A31.Tet50.matrix.panel <- make.matrix.panel(matrix.data, "Tn5+ (TetA+)\np15A\nTet 50") +
         theme(axis.text.y=element_blank())
-    B30.A18.Tet50.matrix.panel <- make.matrix.panel(matrix.data,"B30\npUC\n50") +
+    
+    B30.noPlasmid.Tet50.matrix.panel <- make.matrix.panel(matrix.data,"Tn5+ (TetA++)\nNo plasmid\nTet 50") +
+        theme(axis.text.y=element_blank())
+    B30.A31.Tet50.matrix.panel <- make.matrix.panel(matrix.data, "Tn5+ (TetA++)\np15A\nTet 50") +
         theme(axis.text.y=element_blank())
     
     ## Using the patchwork library for layout.
     matrix.figure <-
+        B59.noPlasmid.Tet50.matrix.panel +
         B20.noPlasmid.Tet50.matrix.panel +
         B30.noPlasmid.Tet50.matrix.panel +
+        B59.A31.Tet50.matrix.panel +
         B20.A31.Tet50.matrix.panel +
         B30.A31.Tet50.matrix.panel +
-        B20.A18.Tet50.matrix.panel +
-        B30.A18.Tet50.matrix.panel +
         plot_layout(nrow = 1)
     return(matrix.figure)
 }
@@ -398,7 +415,7 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
     ## First, make a mutation matrix for plotting.
     matrix.data <- evolved.muts %>%
         ## unite the Transposon, Plasmid, Tet columns together.
-        unite("Treatment", Transposon:Tet, sep="\n", remove = FALSE) %>%
+        unite("Treatment", Transposon_factor:Tet_factor, sep="\n", remove = FALSE) %>%
         group_by(Gene, Sample, Transposon, Plasmid, Tet, Treatment) %>%
         summarize(summed.Allele.Frequency = sum(Frequency)) %>%
         ## This is for sorting mutations.
@@ -425,17 +442,17 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
         arrange(desc(is.MOB), desc(totalallelefreq))
     
     ## alternative sorting method:
-    ## difference in allele frequency between the pUC and noPlasmid treatments..
-    pUC.allele.freq.df <- filter(matrix.data, Plasmid=="pUC") %>%
+    ## difference in allele frequency between the p15A and noPlasmid treatments..
+    p15A.allele.freq.df <- filter(matrix.data, Plasmid=="p15A") %>%
         group_by(Gene, .drop = FALSE) %>%
-        summarize(pUC.allele.frequency=sum(summed.Allele.Frequency))
+        summarize(p15A.allele.frequency=sum(summed.Allele.Frequency))
     
     noPlasmid.allele.freq.df <- filter(matrix.data, Plasmid=="None") %>%
         group_by(Gene, .drop = FALSE) %>%
         summarize(noPlasmid.allele.frequency = sum(summed.Allele.Frequency))
     
-    treatment.freq.sort <- full_join(pUC.allele.freq.df, noPlasmid.allele.freq.df) %>%
-        replace_na(list(pUC.allele.frequency = 0, pUC.allele.frequency = 0)) %>%
+    treatment.freq.sort <- full_join(p15A.allele.freq.df, noPlasmid.allele.freq.df) %>%
+        replace_na(list(p15A.allele.frequency = 0, p15A.allele.frequency = 0)) %>%
         mutate(allele.diff = noPlasmid.allele.frequency - noPlasmid.allele.frequency) %>%
         arrange(desc(allele.diff))
 
@@ -474,35 +491,33 @@ MakeSummedAlleleFrequencyMatrixFigure <- function(evolved.muts,
     }
     
 
-    B20.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\nNone\n50", add.legend)
+    B59.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "Tn5- (TetA++)\nNo plasmid\nTet 50", add.legend) + theme(axis.text.y=element_blank())
     ## Remove the gene labels for the additional matrices to save space.
-    B20.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\np15A\n50", add.legend)  +
-        theme(axis.text.y=element_blank())
-    B20.A18.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B20\npUC\n50", add.legend)  +
-        theme(axis.text.y=element_blank())
+    B59.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "Tn5- (TetA++)\np15A\nTet 50", add.legend) + theme(axis.text.y=element_blank())
     
-    B30.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\nNone\n50", add.legend)  +
-        theme(axis.text.y=element_blank())
-    B30.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\np15A\n50", add.legend)  +
-        theme(axis.text.y=element_blank())
-    B30.A18.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "B30\npUC\n50", add.legend)  +
-        theme(axis.text.y=element_blank())
+    B20.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "Tn5+ (TetA+)\nNo plasmid\nTet 50", add.legend) + theme(axis.text.y=element_blank())
+    
+    B20.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "Tn5+ (TetA+)\np15A\nTet 50", add.legend)  + theme(axis.text.y=element_blank())
+    
+    B30.noPlasmid.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "Tn5+ (TetA++)\nNo plasmid\nTet 50", add.legend)  + theme(axis.text.y=element_blank())
+    
+    B30.A31.Tet50.matrix.panel <- make.allele.freq.matrix.panel(matrix.data, "Tn5+ (TetA++)\np15A\nTet 50", add.legend)  + theme(axis.text.y=element_blank())
 
     if (add.legend) {
         ## get the legend from the last panel.
-        my.legend <- get_legend(B30.A18.Tet50.matrix.panel)
+        my.legend <- get_legend(B30.A31.Tet50.matrix.panel)
         ## now remove the legend from the panel.
-        B30.A18.Tet50.matrix.panel <- B30.A18.Tet50.matrix.panel + guides(fill = "none")
+        B30.A31.Tet50.matrix.panel <- B30.A31.Tet50.matrix.panel + guides(fill = "none")
     }
     
     ## Using the patchwork library for layout.
     matrix.figure <-
+        B59.noPlasmid.Tet50.matrix.panel +
         B20.noPlasmid.Tet50.matrix.panel +
         B30.noPlasmid.Tet50.matrix.panel +
+        B59.A31.Tet50.matrix.panel +
         B20.A31.Tet50.matrix.panel +
         B30.A31.Tet50.matrix.panel +
-        B20.A18.Tet50.matrix.panel +
-        B30.A18.Tet50.matrix.panel +
         plot_layout(nrow = 1) +
         plot_layout(guides = "collect") & theme(legend.position = 'bottom')
 
@@ -547,18 +562,17 @@ parallel.mutations.in.only.Tet0 <- evolved.mutations %>%
 
 
 ## Figure 3.
-## genes that only show parallelism in Tet 50, and all MOB (these are only in Tet50 treatment anyway).
+## genes that show parallelism in Tet 50, and all MOB (these are only in Tet50 treatment anyway).
 parallel.genes.in.Tet50 <- parallel.genes %>%
     select(Gene, Tet) %>%
     filter(Tet == 50) %>%
-    distinct() %>%
-    filter(!(Gene %in% parallel.genes.across.Tet0.and.Tet50$Gene))
+   distinct()
 
-parallel.mutations.in.only.Tet50 <- evolved.mutations %>%
+parallel.mutations.in.Tet50 <- evolved.mutations %>%
     filter(Gene %in% parallel.genes.in.Tet50$Gene)
 
 Fig3.data <- full_join(evolved.MOB,
-                       filter(parallel.mutations.in.only.Tet50, Allele != "MOB"))
+                       filter(parallel.mutations.in.Tet50, Allele != "MOB"))
 
 Fig3A <- MakeMutCountMatrixFigure(Fig3.data,
                                  show.all=TRUE, ## This is needed to show the MOB insertions too.
