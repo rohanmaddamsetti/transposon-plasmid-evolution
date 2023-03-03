@@ -71,6 +71,9 @@ evolved.mutations <- read.csv(
     mutate(Mbp.coordinate=Position/1000000) %>%
         ## remove the pUC samples from the analysis.
     filter(Plasmid != "pUC") %>%
+    ## update the symbol used for intergenic regions on the plasmid
+    ## so that it is not replaced by "..." in the figures.
+    mutate(Gene = str_replace(Gene,"–/KanR", "-/KanR")) %>%
     ## update the names of the Transposon factor for a prettier plot.
     mutate(Transposon_factor = fct_recode(as.factor(Transposon),
                                           `Tn5+ (TetA++)` = "B30",
@@ -153,7 +156,7 @@ make.mutation.class.df <- function(evolved.mutations.df) {
                                pseudogene = "Pseudogene",
                                intergenic = "Intergenic",
                                )) %>%
-        group_by(Sample, Transposon, Plasmid, Tet, Population, Mutation) %>%
+        group_by(Sample, Transposon, Plasmid, Tet, Population, Mutation, Transposon_factor, Plasmid_factor, Tet_factor) %>%
         summarize(Count=n(),WeightedCount = sum(Frequency)) %>%
         ungroup() %>%
         data.frame() %>%
@@ -173,7 +176,7 @@ plot.mutation.summary.stackbar <- function(mutation.class.df, leg=FALSE, weight.
 
     fig <- fig +
         ## show both tetracycline concentrations.
-        facet_wrap(.~Tet) +
+        facet_grid(Transposon_factor~Tet_factor) +
         geom_bar(stat='identity') +
         scale_fill_brewer(palette = "RdYlBu", direction=-1,drop=FALSE) +        
         theme_classic(base_family='Helvetica') +
@@ -197,22 +200,19 @@ plot.mutation.summary.stackbar <- function(mutation.class.df, leg=FALSE, weight.
     return(fig)
 }
 
-## Now make S2Fig and Figure 2C.
-mutation.class.df <- make.mutation.class.df(evolved.mutations) %>%
-    mutate(Tet=recode(Tet,
-                      `0` = "Tet 0",
-                      `50` = "Tet 50"))
+## this figure will probably go into supplement, if it makes it into the manuscript.
+mutation.class.df <- make.mutation.class.df(evolved.mutations)
 
-S2Fig <- plot.mutation.summary.stackbar(mutation.class.df, FALSE, FALSE)
-ggsave(S2Fig, file="../results/draft-manuscript-1A/S2Fig.pdf")
+ARG.dup.stackbar <- plot.mutation.summary.stackbar(mutation.class.df, TRUE, FALSE)
+ggsave(ARG.dup.stackbar, file="../results/draft-manuscript-1A/ARG-dup-stackbar.pdf")
 
 ## Repeat, but weight by allele frequency. This goes into
-Fig2C <- plot.mutation.summary.stackbar(mutation.class.df, TRUE, TRUE)
+##Fig2C <- plot.mutation.summary.stackbar(mutation.class.df, TRUE, TRUE)
 
-Fig2 <- plot_grid(Fig2AB, Fig2C, labels = c('','C'),nrow=2)
+##Fig2 <- plot_grid(Fig2AB, Fig2C, labels = c('','C'),nrow=2)
 ## save figure 2.
-fig2.output <- "../results/draft-manuscript-1A/Fig2.pdf"
-ggsave(Fig2, file=fig2.output,width=8,height=8)
+##fig2.output <- "../results/draft-manuscript-1A/Fig2.pdf"
+##ggsave(Fig2, file=fig2.output,width=8,height=8)
 
 
 ################################################################################
@@ -578,8 +578,11 @@ Fig3A <- MakeMutCountMatrixFigure(Fig3.data,
                                  show.all=TRUE, ## This is needed to show the MOB insertions too.
                                  use.treatment.hit.sort=FALSE)
 
-Fig3.outf <- "../results/draft-manuscript-1A/Fig3A.pdf"
-ggsave(Fig3.outf, Fig3A, height=6, width=12)
+## this can be Figure 1E in the ARG duplications manuscript.
+Fig3A.outf <- "../results/draft-manuscript-1A/Fig3A.pdf"
+ggsave(Fig3A.outf, Fig3A, height=6, width=12)
+ggsave("../results/draft-manuscript-1A/ARG-dup-Fig4E.pdf", Fig3A, height=6, width=12)
+
 
 S1Fig <- MakeMutCountMatrixFigure(evolved.mutations, show.all=TRUE, use.treatment.hit.sort=FALSE)
 S1matrix.outf <- "../results/draft-manuscript-1A/S1Fig.pdf"
